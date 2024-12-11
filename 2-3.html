@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Тест для младшего состава</title>
     <style>
+        /* Основные стили для страницы */
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
@@ -23,6 +24,7 @@
             text-align: center;
             color: #333;
         }
+        /* Основные стили для форм */
         label {
             display: block;
             margin: 15px 0 5px;
@@ -39,33 +41,45 @@
         input:invalid, select:invalid {
             border-color: red;
         }
+        /* Стили для чекбоксов */
         .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
             margin-bottom: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px; /* Равномерные отступы между ответами */
         }
         .checkbox-group label {
             display: flex;
-            align-items: center; /* Выровнять текст и чекбокс по вертикали */
-            gap: 10px; /* Расстояние между чекбоксом и текстом */
+            align-items: center;
+            gap: 10px;
             font-weight: normal;
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .checkbox-group label:hover {
+            background: #f1f1f1;
         }
         .checkbox-group input {
-            margin: 0; /* Убираем стандартные отступы чекбокса */
+            margin: 0;
         }
+        /* Кнопки и результат теста */
         button {
             width: 100%;
             padding: 10px;
-            background-color: #007BFF;
+            background-color: #28a745;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
+            transition: background-color 0.3s ease;
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: #218838;
         }
         .result {
             margin-top: 20px;
@@ -89,20 +103,22 @@
 </head>
 <body>
     <div class="container">
-        <h1>Повышение с 2 до 3</h1>
+        <h1>Тест на повышение с 2 до 3 ранга</h1>
         <form id="quizForm">
             <label for="name">Введите ваше имя:</label>
             <input type="text" id="name" name="name" placeholder="Например: Evgen_Larusso" required>
             <div id="errorMessageName" class="error"></div>
 
             <label>1. Можно ли младшему составу получать премии, брать что-то в аренду? (1 балл)</label>
-            <select id="q1" required>
-                <option value="">Выберите ответ</option>
-                <option value="нельзя">Нельзя</option>
-                <option value="можно каждому">Получить премию и брать аренду можно каждому</option>
-                <option value="с разрешения">С разрешения главы семьи</option>
-            </select>
-            <div id="errorMessageQ1" class="error"></div>
+<select id="q1" required>
+    <option value="">Выберите ответ</option>
+    <option value="нельзя">Нельзя</option>
+    <option value="можно каждому">Получить премию и брать аренду можно каждому</option>
+     <option value="с разрешения">С разрешения главы семьи</option>
+<option value="с разрешения">С разрешения старшего состава</option>
+</select>
+<div id="errorMessageQ1" class="error"></div>
+
 
             <label>2. Кому подчиняется младший состав? (1 балл)</label>
             <select id="q2" required>
@@ -135,7 +151,7 @@
             <div class="checkbox-group">
                 <label>
                     <input type="checkbox" name="q5" value="уважительная причина">
-                    Разрешено, по уважительной причине
+                    Разрешено, если есть уважительная причина
                 </label>
                 <label>
                     <input type="checkbox" name="q5" value="может">
