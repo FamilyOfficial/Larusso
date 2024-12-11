@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест для старшого состава</title>
+    <style>
+        /* Основные стили для страницы */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        /* Основные стили для форм */
+        label {
+            display: block;
+            margin: 15px 0 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            transition: border-color 0.3s ease;
+        }
+        input:invalid, select:invalid {
+            border-color: red;
+        }
+        /* Стили для чекбоксов */
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: normal;
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .checkbox-group label:hover {
+            background: #f1f1f1;
+        }
+        .checkbox-group input {
+            margin: 0;
+        }
+        /* Кнопки и результат теста */
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e9f7e9;
+            border: 1px solid #c1e1c1;
+            border-radius: 8px;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .result.show {
+            display: block;
+            opacity: 1;
+        }
+        .error {
+            color: red;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Тест на повышение с 5 до 6 ранга</h1>
+        <form id="quizForm">
+            <label for="name">Введите ваше имя:</label>
+            <input type="text" id="name" name="name" placeholder="Например: Evgen_Larusso" required>
+            <div id="errorMessageName" class="error"></div>
+
+            <label>1. Со скольки и до скольки проводится МП зловещий дворец? (1 балл)</label>
+            <select id="q1" required>
+                <option value="">Выберите ответ</option>
+                <option value="с 18:00 МСК">С 18:00 МСК</option>
+                <option value="с 19:00 МСК">С 19:00 МСК</option>
+                <option value="с 20:00 МСК">С 20:00 МСК</option>
+                <option value="с 21:00 МСК">С 21:00 МСК</option>
+                <option value="с 22:00 МСК">С 22:00 МСК</option>
+            </select>
+            <div id="errorMessageQ1" class="error"></div>
+
+            <label>2. Разрешено ли использовать любой вид оружия? (Зловещий дворец) (1 балл)</label>
+            <select id="q2" required>
+                <option value="">Выберите ответ</option>
+                <option value="разрешено">Разрешено использовать только холодное оружие</option>
+                <option value="запрещено">Запрещено использовать огнестрельное оружие</option>
+                <option value="разрешено">Разрешено использовать только в оборонительных целях</option>
+                <option value="запрещено">Запрещено использовать</option>
+                <option value="разрешено">Разрешено использовать только пистолеты</option>
+            </select>
+            <div id="errorMessageQ2" class="error"></div>
+
+            <label>3. Разрешено ли использовать бронежилет во время перестрелки с игроком? (Зловещий дворец) (1 балл)</label>
+            <select id="q3" required>
+                <option value="">Выберите ответ</option>
+                <option value="разрешено">Разрешено использовать только легкие бронежилеты</option>
+                <option value="запрещено">Запрещено использовать бронежилеты в здании</option>
+                <option value="разрешено">Разрешено, если ты находишься в зоне защиты</option>
+                <option value="запрещено">Запрещено</option>
+                <option value="разрешено">Разрешено только для членов старшего состава</option>
+            </select>
+            <div id="errorMessageQ3" class="error"></div>
+
+            <label>4. Разрешено ли использовать маски (WarFam)? (1 балл)</label>
+            <select id="q4" required>
+                <option value="">Выберите ответ</option>
+                <option value="разрешено">Разрешено только на совместных активностях</option>
+                <option value="запрещено">Запрещено использовать маски на общих встречах</option>
+                <option value="разрешено">Разрешено для защиты от пыли</option>
+                <option value="запрещено">Запрещено использовать любые маски</option>
+                <option value="разрешено">Разрешено только для определенных операций</option>
+            </select>
+            <div id="errorMessageQ4" class="error"></div>
+
+            <label>5. Разрешено ли намеренно убивать участника семьи? (WarFam) (1 балл)</label>
+            <select id="q5" required>
+                <option value="">Выберите ответ</option>
+                <option value="разрешено">Разрешено, если он нарушил правила</option>
+                <option value="запрещено">Запрещено, если он из другой семьи</option>
+                <option value="разрешено">Разрешено в случае самообороны</option>
+                <option value="запрещено">Запрещено, если это не вызвано необходимостью</option>
+                <option value="разрешено">Разрешено только с одобрения руководства</option>
+            </select>
+            <div id="errorMessageQ5" class="error"></div>
+
+            <label>6. Разрешено ли использовать любые баги стрельбы? (WarFam) (1 балл)</label>
+            <select id="q6" required>
+                <option value="">Выберите ответ</option>
+                <option value="разрешено">Разрешено использовать баги для прицеливания</option>
+                <option value="запрещено">Запрещено использовать баги, которые дают преимущество</option>
+                <option value="разрешено">Разрешено использовать любые баги, кроме багов с отдачей</option>
+                <option value="запрещено">Запрещено использовать баги в бою</option>
+                <option value="разрешено">Разрешено только для отработки навыков</option>
+            </select>
+            <div id="errorMessageQ6" class="error"></div>
+
+            <button type="button" id="submitButton">Отправить</button>
+        </form>
+
+        <div class="result" id="result">
+            <h2>Результаты:</h2>
+            <p id="resultContent"></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('submitButton').addEventListener('click', function() {
+            const name = document.getElementById('name').value.trim();
+            const q1 = document.getElementById('q1').value;
+            const q2 = document.getElementById('q2').value;
+            const q3 = document.getElementById('q3').value;
+            const q4 = document.getElementById('q4').value;
+            const q5 = document.getElementById('q5').value;
+            const q6 = document.getElementById('q6').value;
+            
+            if (!name) {
+                document.getElementById('errorMessageName').textContent = 'Пожалуйста, введите ваше имя.';
+                return;
+            }
+
+            document.getElementById('errorMessageName').textContent = '';
+            
+            let correctAnswers = 0;
+            if (q1 === "с 20:00 МСК") correctAnswers++;
+            if (q2 === "запрещено") correctAnswers++;
+            if (q3 === "запрещено") correctAnswers++;
+            if (q4 === "запрещено") correctAnswers++;
+            if (q5 === "запрещено") correctAnswers++;
+            if (q6 === "запрещено") correctAnswers++;
+
+             // Вывод результата
+            const resultContent = `
+                Имя: ${name}<br>
+                Ваш результат: ${score} из 6 баллов<br>
+                ${score === 6 ? "Поздравляем! Вы успешно прошли тест." : "Попробуйте еще раз, чтобы достичь максимального результата."}
+            `;
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.classList.add('show');
+            document.getElementById('resultContent').innerHTML = resultContent;
+            document.getElementById('quizForm').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
