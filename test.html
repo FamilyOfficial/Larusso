@@ -114,45 +114,61 @@
 
     <script>
     document.getElementById('submitButton').addEventListener('click', function() {
-        const name = document.getElementById('name').value.trim();
-        const q1 = document.getElementById('q1').value;
-        const q2 = document.getElementById('q2').value;
-        const q3 = document.getElementById('q3').value;
-        const q4 = document.getElementById('q4').value;
-        const q5 = document.getElementById('q5').value;
-        
-        let isError = false;
+    const name = document.getElementById('name').value.trim();
+    const q1 = document.getElementById('q1').value;
+    const q2 = document.getElementById('q2').value;
+    const q3 = document.getElementById('q3').value;
+    const q4 = document.getElementById('q4').value;
+    const q5 = document.getElementById('q5').value;
+    const q6 = document.getElementById('q6').value;
 
-        // Проверка поля "Имя"
-        if (!name) {
-            alert("Пожалуйста, введите ваше имя.");
-            isError = true;
-        }
+    let isError = false; // Объявляем переменную
+    
+    // Проверка на пустые поля
+    if (!name) {
+        document.getElementById('errorMessageName').textContent = "Имя обязательно для заполнения.";
+        isError = true;
+    } else {
+        document.getElementById('errorMessageName').textContent = "";
+    }
+    if (!q1) {
+        document.getElementById('errorMessageQ1').textContent = "Выберите вариант для первого вопроса.";
+        isError = true;
+    } else {
+        document.getElementById('errorMessageQ1').textContent = "";
+    }
+    if (!q2) {
+        document.getElementById('errorMessageQ2').textContent = "Выберите вариант для второго вопроса.";
+        isError = true;
+    } else {
+        document.getElementById('errorMessageQ2').textContent = "";
+    }
+    if (!q3) {
+        document.getElementById('errorMessageQ3').textContent = "Выберите вариант для третьего вопроса.";
+        isError = true;
+    } else {
+        document.getElementById('errorMessageQ3').textContent = "";
+    }
+    if (!q4) {
+        document.getElementById('errorMessageQ4').textContent = "Выберите вариант для четвертого вопроса.";
+        isError = true;
+    } else {
+        document.getElementById('errorMessageQ4').textContent = "";
+    }
+    if (!q5) {
+        document.getElementById('errorMessageQ5').textContent = "Выберите вариант для пятого вопроса.";
+        isError = true;
+    } else {
+        document.getElementById('errorMessageQ5').textContent = "";
+    }
+    if (!q6) {
+        document.getElementById('errorMessageQ6').textContent = "Выберите вариант для шестого вопроса.";
+        isError = true;
+    } else {
+        document.getElementById('errorMessageQ6').textContent = "";
+    }
 
-        // Проверка ответов на вопросы
-        if (!q1) {
-            alert("Ответьте на вопрос 1.");
-            isError = true;
-        }
-        if (!q2) {
-            alert("Ответьте на вопрос 2.");
-            isError = true;
-        }
-        if (!q3) {
-            alert("Ответьте на вопрос 3.");
-            isError = true;
-        }
-        if (!q4) {
-            alert("Ответьте на вопрос 4.");
-            isError = true;
-        }
-        if (!q5) {
-            alert("Ответьте на вопрос 5.");
-            isError = true;
-        }
-
-        if (isError) return; // Если есть ошибки, завершить выполнение
-                
+    if (isError) return; //
             // Правильные ответы
             const correctAnswers = {
                 q1: 'нельзя',
