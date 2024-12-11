@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Повышение с 1 до 2</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin: 15px 0 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e9f7e9;
+            border: 1px solid #c1e1c1;
+            border-radius: 8px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Повышение с 1 до 2</h1>
+        <form id="quizForm">
+            <label for="name">Введите ваше имя:</label>
+            <input type="text" id="name" name="name" placeholder="Например: Evgen_Larusso" required>
+
+            <label>1. Разрешено ли членам семьи, не состоящим в КС, употреблять наркотики во время кумите или семейных ΜΠ? (1 балл)</label>
+            <select id="q1" required>
+                <option value="">Выберите ответ</option>
+                <option value="нельзя">Нельзя</option>
+                <option value="можно">Можно</option>
+            </select>
+
+            <label>2. Кто является гарантом защиты прав членов семьи? (1 балл)</label>
+            <select id="q2" required>
+                <option value="">Выберите ответ</option>
+                <option value="глава">Глава</option>
+                <option value="сам">Сам себе гарантюр</option>
+                <option value="никто">Никто</option>
+            </select>
+
+            <label>3. В какое время можно арендовать транспорт у главы семьи? (1 балл)</label>
+            <select id="q3" required>
+                <option value="">Выберите ответ</option>
+                <option value="17">17 МСК</option>
+                <option value="16">16 МСК</option>
+                <option value="15">15 МСК</option>
+                <option value="другое">Другое</option>
+            </select>
+
+            <label>4. Должен ли каждый член семьи с честью носить доброе имя Ларуссо? (1 балл)</label>
+            <select id="q4" required>
+                <option value="">Выберите ответ</option>
+                <option value="нет">Нет это ево выбор</option>
+                <option value="да">Да это обезательно</option>
+            </select>
+
+            <label>5. Что должен делать каждый член семьи? (1 балл)</label>
+            <select id="q5" required>
+                <option value="">Выберите ответ</option>
+                <option value="вносить">Вносить посильный вклад в развитие семьи</option>
+                <option value="ничего">Ничего</option>
+            </select>
+
+            <button type="button" id="submitButton">Отправить</button>
+        </form>
+
+        <div class="result" id="result">
+            <h2>Результаты:</h2>
+            <p id="resultContent"></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('submitButton').addEventListener('click', function() {
+            const name = document.getElementById('name').value;
+            const q1 = document.getElementById('q1').value;
+            const q2 = document.getElementById('q2').value;
+            const q3 = document.getElementById('q3').value;
+            const q4 = document.getElementById('q4').value;
+            const q5 = document.getElementById('q5').value;
+
+            // Правильные ответы
+            const correctAnswers = {
+                q1: 'нельзя',
+                q2: 'глава',
+                q3: '17',
+                q4: 'нет',
+                q5: 'вносить'
+            };
+
+            // Подсчет баллов
+            let score = 0;
+            if (q1 === correctAnswers.q1) score++;
+            if (q2 === correctAnswers.q2) score++;
+            if (q3 === correctAnswers.q3) score++;
+            if (q4 === correctAnswers.q4) score++;
+            if (q5 === correctAnswers.q5) score++;
+
+            // Вывод результата
+            const resultContent = `
+                Имя: ${name}<br>
+                Ваш результат: ${score} из 5 баллов<br>
+                ${score === 5 ? "Поздравляем! Вы успешно прошли тест." : "Попробуйте еще раз, чтобы достичь максимального результата."}
+            `;
+
+            document.getElementById('resultContent').innerHTML = resultContent;
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('quizForm').style.display = 'none';
+        });
+    </script>
+</body>
+  </html>
