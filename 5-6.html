@@ -124,9 +124,9 @@
             <select id="q2" required>
                 <option value="">Выберите ответ</option>
                 <option value="разрешено">Разрешено использовать только холодное оружие</option>
-                <option value="запрещено">Запрещено использовать огнестрельное оружие</option>
+                <option value="Запрещено использовать огнестрельное оружие">Запрещено использовать огнестрельное оружие</option>
                 <option value="разрешено">Разрешено использовать только в оборонительных целях</option>
-                <option value="запрещено">Запрещено использовать</option>
+                <option value="Запрещено использовать">Запрещено использовать</option>
                 <option value="разрешено">Разрешено использовать только пистолеты</option>
             </select>
             <div id="errorMessageQ2" class="error"></div>
@@ -137,7 +137,7 @@
                 <option value="разрешено">Разрешено использовать только легкие бронежилеты</option>
                 <option value="запрещено">Запрещено использовать бронежилеты в здании</option>
                 <option value="разрешено">Разрешено, если ты находишься в зоне защиты</option>
-                <option value="запрещено">Запрещено</option>
+                <option value="Запрещено использовать любые бронежилеты">Запрещено использовать любые бронежилеты</option>
                 <option value="разрешено">Разрешено только для членов старшего состава</option>
             </select>
             <div id="errorMessageQ3" class="error"></div>
@@ -145,10 +145,10 @@
             <label>4. Разрешено ли использовать маски (WarFam)? (1 балл)</label>
             <select id="q4" required>
                 <option value="">Выберите ответ</option>
-                <option value="разрешено">Разрешено только на совместных активностях</option>
+                <option value="разрешено">Незнаю</option>
                 <option value="запрещено">Запрещено использовать маски на общих встречах</option>
                 <option value="разрешено">Разрешено для защиты от пыли</option>
-                <option value="запрещено">Запрещено использовать любые маски</option>
+                <option value="Запрещено использовать любые маски">Запрещено использовать любые маски</option>
                 <option value="разрешено">Разрешено только для определенных операций</option>
             </select>
             <div id="errorMessageQ4" class="error"></div>
@@ -156,22 +156,22 @@
             <label>5. Разрешено ли намеренно убивать участника семьи? (WarFam) (1 балл)</label>
             <select id="q5" required>
                 <option value="">Выберите ответ</option>
-                <option value="разрешено">Разрешено, если он нарушил правила</option>
-                <option value="запрещено">Запрещено, если он из другой семьи</option>
-                <option value="разрешено">Разрешено в случае самообороны</option>
-                <option value="запрещено">Запрещено, если это не вызвано необходимостью</option>
-                <option value="разрешено">Разрешено только с одобрения руководства</option>
+                <option value="Разрешено, если он нарушил правила">Разрешено, если он нарушил правила</option>
+                <option value="Запрещене">Запрещено</option>
+                <option value="Разрешено в случае самообороны">Разрешено в случае самообороны</option>
+                <option value="Запрещено, если это не вызвано необходимостью">Запрещено, если это не вызвано необходимостью</option>
+                <option value="Разрешено только с одобрения руководства">Разрешено только с одобрения руководства</option>
             </select>
             <div id="errorMessageQ5" class="error"></div>
 
             <label>6. Разрешено ли использовать любые баги стрельбы? (WarFam) (1 балл)</label>
             <select id="q6" required>
                 <option value="">Выберите ответ</option>
-                <option value="разрешено">Разрешено использовать баги для прицеливания</option>
-                <option value="запрещено">Запрещено использовать баги, которые дают преимущество</option>
-                <option value="разрешено">Разрешено использовать любые баги, кроме багов с отдачей</option>
-                <option value="запрещено">Запрещено использовать баги в бою</option>
-                <option value="разрешено">Разрешено только для отработки навыков</option>
+                <option value="Разрешено использовать баги для прицеливания">Разрешено использовать баги для прицеливания</option>
+                <option value="Запрещено использовать баги, которые дают преимущество">Запрещено использовать баги, которые дают преимущество</option>
+                <option value="Разрешено использовать любые баги, кроме багов с отдачей">Разрешено использовать любые баги, кроме багов с отдачей</option>
+                <option value="Запрещено использовать баги в бою">Запрещено использовать баги в бою</option>
+                <option value="Запрещено вообще">Запрещено вообще</option>
             </select>
             <div id="errorMessageQ6" class="error"></div>
 
@@ -185,42 +185,80 @@
     </div>
 
     <script>
-        document.getElementById('submitButton').addEventListener('click', function() {
-            const name = document.getElementById('name').value.trim();
-            const q1 = document.getElementById('q1').value;
-            const q2 = document.getElementById('q2').value;
-            const q3 = document.getElementById('q3').value;
-            const q4 = document.getElementById('q4').value;
-            const q5 = document.getElementById('q5').value;
-            const q6 = document.getElementById('q6').value;
-            
+    document.getElementById('submitButton').addEventListener('click', function() {
+        const name = document.getElementById('name').value.trim();
+        const q1 = document.getElementById('q1').value;
+        const q2 = document.getElementById('q2').value;
+        const q3 = document.getElementById('q3').value;
+        const q4 = document.getElementById('q4').value;
+        const q5 = document.getElementById('q5').value;
+        const q6 = document.getElementById('q6').value;
+        
+  // Проверка на пустые поля
             if (!name) {
-                document.getElementById('errorMessageName').textContent = 'Пожалуйста, введите ваше имя.';
-                return;
+                document.getElementById('errorMessageName').textContent = "Имя обязательно для заполнения.";
+                isError = true;
+            } else {
+                document.getElementById('errorMessageName').textContent = "";
+            }
+            if (!q1) {
+                document.getElementById('errorMessageQ1').textContent = "Выберите вариант для первого вопроса.";
+                isError = true;
+            } else {
+                document.getElementById('errorMessageQ1').textContent = "";
+            }
+            if (!q2) {
+                document.getElementById('errorMessageQ2').textContent = "Выберите вариант для второго вопроса.";
+                isError = true;
+            } else {
+                document.getElementById('errorMessageQ2').textContent = "";
+            }
+            if (!q3) {
+                document.getElementById('errorMessageQ3').textContent = "Выберите вариант для третьего вопроса.";
+                isError = true;
+            } else {
+                document.getElementById('errorMessageQ3').textContent = "";
+            }
+            if (!q4) {
+                document.getElementById('errorMessageQ4').textContent = "Выберите вариант для четвертого вопроса.";
+                isError = true;
+            } else {
+                document.getElementById('errorMessageQ4').textContent = "";
+            }
+            if (!q5) {
+                document.getElementById('errorMessageQ5').textContent = "Выберите вариант для пятого вопроса.";
+                isError = true;
+            } else {
+                document.getElementById('errorMessageQ5').textContent = "";
+            }
+             if (!q6) {
+                document.getElementById('errorMessageQ6').textContent = "Выберите вариант для шестого вопроса.";
+                isError = true;
+            } else {
+                document.getElementById('errorMessageQ6').textContent = "";
             }
 
-            document.getElementById('errorMessageName').textContent = '';
-            
-            let correctAnswers = 0;
-            if (q1 === "с 20:00 МСК") correctAnswers++;
-            if (q2 === "запрещено") correctAnswers++;
-            if (q3 === "запрещено") correctAnswers++;
-            if (q4 === "запрещено") correctAnswers++;
-            if (q5 === "запрещено") correctAnswers++;
-            if (q6 === "запрещено") correctAnswers++;
+            if (isError) return;
+        let correctAnswers = 0;
+        if (q1 === "с 20:00 МСК") correctAnswers++;
+        if (q2 === "Запрещено использовать огнестрельное оружие") correctAnswers++;
+        if (q3 === "Запрещено использовать любые бронежилеты") correctAnswers++;
+        if (q4 === "Запрещено использовать любые маски") correctAnswers++;
+        if (q5 === "Запрещене") correctAnswers++;
+        if (q6 === "Запрещено вообще") correctAnswers++;
 
-             // Вывод результата
-            const resultContent = `
-                Имя: ${name}<br>
-                Ваш результат: ${score} из 6 баллов<br>
-                ${score === 6 ? "Поздравляем! Вы успешно прошли тест." : "Попробуйте еще раз, чтобы достичь максимального результата."}
-            `;
+        // Вывод результата
+        const resultContent = `
+            Имя: ${name}<br>
+            Ваш результат: ${correctAnswers} из 6 баллов<br>
+            ${correctAnswers === 6 ? "Поздравляем! Вы успешно прошли тест." : "Попробуйте еще раз, чтобы достичь максимального результата."}
+        `;
 
-            const resultDiv = document.getElementById('result');
-            resultDiv.classList.add('show');
-            document.getElementById('resultContent').innerHTML = resultContent;
-            document.getElementById('quizForm').style.display = 'none';
-        });
-    </script>
+        const resultDiv = document.getElementById('result');
+        resultDiv.classList.add('show');
+        document.getElementById('resultContent').innerHTML = resultContent;
+        document.getElementById('quizForm').style.display = 'none';
+    });
+</script>
 </body>
 </html>
