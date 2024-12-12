@@ -112,11 +112,11 @@
             <label>1. Со скольки и до скольки проводится МП зловещий дворец? (1 балл)</label>
             <select id="q1" required>
                 <option value="">Выберите ответ</option>
-                <option value="с 18:00 МСК">С 18:00 МСК</option>
-                <option value="с 19:00 МСК">С 19:00 МСК</option>
-                <option value="с 20:00 МСК">С 20:00 МСК</option>
-                <option value="с 21:00 МСК">С 21:00 МСК</option>
-                <option value="с 22:00 МСК">С 22:00 МСК</option>
+                <option value="с 18:00 МСК">С 18:00 до 18:20 МСК</option>
+                <option value="с 19:00 МСК">С 19:00 до 19:17 МСК</option>
+                <option value="с 20:00 МСК">С 20:00 до 20:15 МСК</option>
+                <option value="с 21:00 МСК">С 21:00 до 21:35 МСК</option>
+                <option value="с 22:00 МСК">С 22:00 до 23:05 МСК</option>
             </select>
             <div id="errorMessageQ1" class="error"></div>
 
@@ -128,13 +128,14 @@
                 <option value="разрешено">Разрешено использовать только в оборонительных целях</option>
                 <option value="Запрещено использовать">Запрещено использовать</option>
                 <option value="разрешено">Разрешено использовать только пистолеты</option>
+                <option value="Разрешено использовать">Разрешено использовать любой вид оружия</option>
             </select>
             <div id="errorMessageQ2" class="error"></div>
 
             <label>3. Разрешено ли использовать бронежилет во время перестрелки с игроком? (Зловещий дворец) (1 балл)</label>
             <select id="q3" required>
                 <option value="">Выберите ответ</option>
-                <option value="разрешено">Разрешено использовать только легкие бронежилеты</option>
+                <option value="Запрещено использовать во время перестрелки">Запрещено использовать во время перестрелки</option>
                 <option value="запрещено">Запрещено использовать бронежилеты в здании</option>
                 <option value="разрешено">Разрешено, если ты находишься в зоне защиты</option>
                 <option value="Запрещено использовать любые бронежилеты">Запрещено использовать любые бронежилеты</option>
@@ -145,7 +146,7 @@
             <label>4. Разрешено ли использовать маски (WarFam)? (1 балл)</label>
             <select id="q4" required>
                 <option value="">Выберите ответ</option>
-                <option value="разрешено">Незнаю</option>
+                <option value="разрешено">я незнаю</option>
                 <option value="запрещено">Запрещено использовать маски на общих встречах</option>
                 <option value="разрешено">Разрешено для защиты от пыли</option>
                 <option value="Запрещено использовать любые маски">Запрещено использовать любые маски</option>
@@ -153,14 +154,14 @@
             </select>
             <div id="errorMessageQ4" class="error"></div>
 
-            <label>5. Разрешено ли намеренно убивать участника семьи? (WarFam) (1 балл)</label>
+            <label>5. Разрешено ли намеренно убивать участников своей семьи? (WarFam) (1 балл)</label>
             <select id="q5" required>
                 <option value="">Выберите ответ</option>
                 <option value="Разрешено, если он нарушил правила">Разрешено, если он нарушил правила</option>
                 <option value="Запрещене">Запрещено</option>
-                <option value="Разрешено в случае самообороны">Разрешено в случае самообороны</option>
+                <option value="Разрешено в случае самообороны">Разрешено если он начел первый</option>
                 <option value="Запрещено, если это не вызвано необходимостью">Запрещено, если это не вызвано необходимостью</option>
-                <option value="Разрешено только с одобрения руководства">Разрешено только с одобрения руководства</option>
+                <option value="Разрешено только с одобрения руководства">Разрешено только с одобрения старшого состава</option>
             </select>
             <div id="errorMessageQ5" class="error"></div>
 
@@ -245,8 +246,8 @@ document.getElementById('submitButton').addEventListener('click', function() {
         
         let correctAnswers = 0;
         if (q1 === "с 20:00 МСК") correctAnswers++;
-        if (q2 === "Запрещено использовать огнестрельное оружие") correctAnswers++;
-        if (q3 === "Запрещено использовать любые бронежилеты") correctAnswers++;
+        if (q2 === "Разрешено использовать любой вид оружия") correctAnswers++;
+        if (q3 === "Запрещено использовать во время перестрелки") correctAnswers++;
         if (q4 === "Запрещено использовать любые маски") correctAnswers++;
         if (q5 === "Запрещене") correctAnswers++;
         if (q6 === "Запрещено вообще") correctAnswers++;
