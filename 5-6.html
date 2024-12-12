@@ -128,7 +128,7 @@
                 <option value="разрешено">Разрешено использовать только в оборонительных целях</option>
                 <option value="Запрещено использовать">Запрещено использовать</option>
                 <option value="разрешено">Разрешено использовать только пистолеты</option>
-                <option value="Разрешено использовать">Разрешено использовать любой вид оружия</option>
+                <option value="Разрешено использовать любой вид оружия">Разрешено использовать любой вид оружия</option>
             </select>
             <div id="errorMessageQ2" class="error"></div>
 
@@ -178,7 +178,6 @@
 
             <button type="button" id="submitButton">Отправить</button>
         </form>
-
         <div class="result" id="result">
             <h2>Результаты:</h2>
             <p id="resultContent"></p>
@@ -257,6 +256,7 @@ if (q6 === "Запрещено вообще") correctAnswers++;
             Ваш результат: ${correctAnswers} из 6 баллов<br>
             ${correctAnswers === 6 ? "Поздравляем! Вы успешно прошли тест." : "Попробуйте еще раз, чтобы достичь максимального результата."}
         `;
+    
 
         const resultDiv = document.getElementById('result');
         resultDiv.classList.add('show');
