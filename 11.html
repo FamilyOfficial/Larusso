@@ -3,28 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Система жалоб - Larusso Family</title>
+    <title>Система жалоб</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            background: linear-gradient(135deg, #4e54c8, #8f94fb);
             color: #fff;
             overflow-x: hidden;
-            position: relative;
-        }
-
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('https://cdn.pixabay.com/photo/2017/09/04/22/23/raspberry-2714388_960_720.png') repeat;
-            opacity: 0.05;
-            z-index: 0;
         }
 
         .container {
@@ -35,8 +22,10 @@
             border-radius: 12px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(10px);
-            z-index: 1;
-            position: relative;
+        }
+
+        .hidden {
+            display: none;
         }
 
         label {
@@ -56,6 +45,7 @@
         }
 
         button {
+            background: #6a11cb;
             background: linear-gradient(135deg, #6a11cb, #2575fc);
             color: #fff;
             cursor: pointer;
@@ -67,8 +57,8 @@
             transform: translateY(-2px);
         }
 
-        .hidden {
-            display: none;
+        .admin-panel {
+            margin-top: 20px;
         }
 
         .complaint-item {
@@ -80,11 +70,6 @@
 
         .complaint-status {
             font-weight: bold;
-        }
-
-        .logout {
-            text-align: center;
-            margin-top: 20px;
         }
 
         /* Снег */
@@ -110,7 +95,7 @@
     </style>
 </head>
 <body>
-    <!-- Регистрация -->
+    <!-- Контейнеры -->
     <div class="container" id="register-form">
         <h2>Регистрация</h2>
         <label for="register-nick">Ваш ник:</label>
@@ -118,10 +103,9 @@
         <label for="register-password">Пароль:</label>
         <input type="password" id="register-password" placeholder="Введите пароль" required>
         <button onclick="register()">Зарегистрироваться</button>
-        <p>Уже есть аккаунт? <button onclick="toggleForms('login')">Войти</button></p>
+        <p>Уже есть аккаунт? <button onclick="showLoginForm()">Войти</button></p>
     </div>
 
-    <!-- Авторизация -->
     <div class="container hidden" id="login-form">
         <h2>Авторизация</h2>
         <label for="login-nick">Ваш ник:</label>
@@ -129,9 +113,9 @@
         <label for="login-password">Пароль:</label>
         <input type="password" id="login-password" placeholder="Введите пароль" required>
         <button onclick="login()">Войти</button>
+        <p>Нет аккаунта? <button onclick="showRegisterForm()">Зарегистрироваться</button></p>
     </div>
 
-    <!-- Пользовательская панель -->
     <div class="container hidden" id="user-form">
         <h2>Подача жалобы</h2>
         <form id="complaint-form">
@@ -143,22 +127,17 @@
             <textarea id="description" rows="5" placeholder="Опишите ситуацию" required></textarea>
             <button type="submit">Отправить жалобу</button>
         </form>
-        <div class="logout"><button onclick="logout()">Выйти</button></div>
     </div>
 
-    <!-- Панель администратора -->
     <div class="container hidden" id="admin-panel">
         <h2>Панель администратора</h2>
-        <div id="complaint-list"></div>
-        <h3>Выдача прав</h3>
-        <label for="role-nick">Ник пользователя:</label>
-        <input type="text" id="role-nick" placeholder="Введите ник для выдачи прав" required>
-        <button onclick="grantRole()">Выдать права администратора</button>
-        <div class="logout"><button onclick="logout()">Выйти</button></div>
+        <div id="complaint-list">
+            <!-- Жалобы будут добавляться сюда -->
+        </div>
     </div>
 
+    <!-- Снег -->
     <script>
-        // Анимация снега
         function createSnowflake() {
             const snowflake = document.createElement("div");
             snowflake.classList.add("snowflake");
@@ -169,23 +148,32 @@
             document.body.appendChild(snowflake);
             setTimeout(() => snowflake.remove(), 10000);
         }
+
         setInterval(createSnowflake, 200);
 
         /* Пользователи */
-        let users = JSON.parse(localStorage.getItem("users")) || [
-            { nick: "Evgen_Larusso", password: "12345678910", role: "admin" }
+        let users = [
+            { nick: "admin", password: "1234", role: "admin" },
+            { nick: "user", password: "1234", role: "user" }
         ];
+
+        /* Жалобы */
         let complaints = JSON.parse(localStorage.getItem("complaints")) || [];
         let currentUser = null;
+
+        function showLoginForm() {
+            document.getElementById("register-form").classList.add("hidden");
+            document.getElementById("login-form").classList.remove("hidden");
+        }
+
+        function showRegisterForm() {
+            document.getElementById("login-form").classList.add("hidden");
+            document.getElementById("register-form").classList.remove("hidden");
+        }
 
         function register() {
             const nick = document.getElementById("register-nick").value;
             const password = document.getElementById("register-password").value;
-
-            if (!nick || !password) {
-                alert("Все поля должны быть заполнены!");
-                return;
-            }
 
             if (users.some(u => u.nick === nick)) {
                 alert("Пользователь с таким ником уже существует!");
@@ -194,13 +182,9 @@
 
             users.push({ nick, password, role: "user" });
             localStorage.setItem("users", JSON.stringify(users));
-            alert("Регистрация успешна!");
-            toggleForms('login');
-        }
 
-        function toggleForms(form) {
-            document.querySelectorAll('.container').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`${form}-form`).classList.remove('hidden');
+            alert("Регистрация успешна!");
+            showLoginForm();
         }
 
         function login() {
@@ -211,20 +195,17 @@
 
             if (user) {
                 currentUser = user;
+                document.getElementById("login-form").classList.add("hidden");
+
                 if (user.role === "admin") {
-                    toggleForms('admin');
+                    document.getElementById("admin-panel").classList.remove("hidden");
                     renderComplaints();
                 } else {
-                    toggleForms('user');
+                    document.getElementById("user-form").classList.remove("hidden");
                 }
             } else {
                 alert("Неверные данные!");
             }
-        }
-
-        function logout() {
-            currentUser = null;
-            toggleForms('login');
         }
 
         document.getElementById("complaint-form").addEventListener("submit", function (event) {
@@ -234,11 +215,6 @@
             const violatorNick = document.getElementById("violator-nick").value;
             const description = document.getElementById("description").value;
 
-            if (!userNick || !violatorNick || !description) {
-                alert("Все поля должны быть заполнены!");
-                return;
-            }
-
             complaints.push({
                 userNick,
                 violatorNick,
@@ -247,6 +223,7 @@
             });
 
             localStorage.setItem("complaints", JSON.stringify(complaints));
+
             alert("Жалоба успешно отправлена!");
             this.reset();
         });
@@ -276,19 +253,6 @@
             complaints[index].status = status;
             localStorage.setItem("complaints", JSON.stringify(complaints));
             renderComplaints();
-        }
-
-        function grantRole() {
-            const nick = document.getElementById("role-nick").value;
-            const user = users.find(u => u.nick === nick);
-
-            if (user) {
-                user.role = "admin";
-                localStorage.setItem("users", JSON.stringify(users));
-                alert(`Права администратора выданы пользователю ${nick}`);
-            } else {
-                alert("Пользователь не найден!");
-            }
         }
     </script>
 </body>
