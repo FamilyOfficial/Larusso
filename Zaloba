@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Жалоба на игрока</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .form-container {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 400px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Форма жалобы на игрока</h2>
+        <form id="complaintForm" method="POST" action="https://formspree.io/f/xpwwobgr" enctype="multipart/form-data">
+            <label for="yourNick">Ваш игровой никнейм:</label>
+            <input type="text" id="yourNick" name="yourNick" placeholder="Ваш никнейм" required>
+
+            <label for="violatorNick">Игровой никнейм нарушителя:</label>
+            <input type="text" id="violatorNick" name="violatorNick" placeholder="Никнейм нарушителя" required>
+
+            <label for="description">Описание:</label>
+            <textarea id="description" name="description" placeholder="Опишите нарушение" rows="4" required></textarea>
+
+            <label for="evidence">Доказательства:</label>
+            <input type="file" id="evidence" name="evidence" accept="image/*,video/*">
+
+            <button type="submit">Отправить жалобу</button>
+        </form>
+    </div>
+</body>
+</html>
