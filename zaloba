@@ -1,831 +1,233 @@
-import telebot
-
-from telebot import types
-
-
-
-BOT_TOKEN = '7799196233:AAGGLSxdMPc3kFg4Ryn4kGsDizyI79TvRss'
-
-ADMIN_CHAT_ID = '1367783654'
-
-
-
-bot = telebot.TeleBot(BOT_TOKEN)
-
-
-
-user_states = {}
-
-
-
-@bot.message_handler(commands=['start'])
-
-def start(message):
-
-    greeting_text = ("Доброго дня, выбери кнопку ниже.\n"
-
-                )
-
-    markup = types.InlineKeyboardMarkup()
-
-    markup.add(
-
-        types.InlineKeyboardButton('Подать жалобу', callback_data='start_complaint'),
-
-        types.InlineKeyboardButton('Кто зам и лидер', callback_data='show_leaders_info'),
-
-        types.InlineKeyboardButton('Снять выг', callback_data='start_remove_warning'),
-
-        types.InlineKeyboardButton('Получить приз', callback_data='start_claim_prize')
-
-    )
-
-    bot.send_message(message.chat.id, greeting_text, reply_markup=markup)
-
-
-
-    user_states[message.chat.id] = {
-
-        'state': 'waiting_for_data',
-
-        'nickname': '',
-
-        'offender_nickname': '',
-
-        'complaint': '',
-
-        'media': [],
-
-        'ticket': ''
-
-    }
-
-
-
-@bot.callback_query_handler(func=lambda call: True)
-
-def handle_callback(call):
-
-    if call.message.chat.id not in user_states:
-
-        bot.send_message(call.message.chat.id, "Пожалуйста, начните с команды /start")
-
-        return
-
-
-
-    if call.data == 'start_complaint':
-
-        start_complaint(call.message)
-
-    elif call.data == 'show_leaders_info':
-
-        show_leaders_info(call.message)
-
-    elif call.data == 'start_remove_warning':
-
-        start_remove_warning(call.message)
-
-    elif call.data == 'start_claim_prize':
-
-        start_claim_prize(call.message)
-
-    elif call.data == 'test_callback':
-
-        state = user_states.get(call.message.chat.id, {})
-
-        print(f"Текущее состояние для {call.message.chat.id}: {state.get('state')}")
-
-        if state.get('state') == 'waiting_for_proof':
-
-            send_complaint_confirmation(call.message)
-
-        elif state.get('state') == 'waiting_for_remove_proof':
-
-            send_remove_confirmation(call.message)
-
-
-
-    elif call.data in ['confirm_yes', 'confirm_no']:
-
-        handle_confirmation(call)
-
-    elif call.data in ['edit_nickname', 'edit_offender', 'edit_complaint', 'edit_proof']:
-
-        handle_edit_choice(call)
-
-    elif call.data == 'edit_remove_nickname' or call.data == 'edit_remove_proof':
-
-        handle_edit_choice_for_remove(call)
-
-    elif call.data == 'no_proof':
-
-        bot.send_message(call.message.chat.id, "Извините, без доказательств мы ничем не можем помочь.")
-
-        del user_states[call.message.chat.id]
-
-
-
-def send_complaint_confirmation(message):
-
-    state = user_states[message.chat.id]
-
-    details_text = (f"Форма подачи жалобы:\n"
-
-                    f"Ваш ник и ранг: {state['nickname']}\n"
-
-                    f"Ник нарушителя: {state['offender_nickname']}\n"
-
-                    f"Описание: {state['complaint']}\n"
-
-                    "Подтвердите информацию.")
-
-    bot.send_message(message.chat.id, details_text, reply_markup=create_confirm_buttons())
-
-
-
-def send_remove_confirmation(message):
-
-    state = user_states[message.chat.id]
-
-    details_text = (f"Форма подачи для снятия выговора:\n"
-
-                    f"Ваш ник и ранг: {state['nickname']}\n"
-
-                    "Проделанная работа: Доказательства приложены.\n"
-
-                    "Подтвердите информацию.")
-
-    bot.send_message(message.chat.id, details_text, reply_markup=create_confirm_buttons())
-
-
-
-
-
-
-
-
-
-@bot.message_handler(content_types=['photo', 'video'],
-
-                     func=lambda message: user_states.get(message.chat.id, {}).get('state') == 'edit_removee_proof')
-
-def handle_edit_remove_proof(message):
-
-    """Обрабатывает отправку новых фото/видео для заявки на снятие выговора"""
-
-    if not isinstance(user_states[message.chat.id]['media'], list):
-
-        user_states[message.chat.id]['media'] = []
-
-
-
-    if message.photo:
-
-        user_states[message.chat.id]['media'].append(message.photo[-1].file_id)
-
-    elif message.video:
-
-        user_states[message.chat.id]['media'].append(message.video.file_id)
-
-    send_remove_confirmation(message)  # Отправляем форму с новыми доказательствами
-
-
-
-
-
-def handle_edit_choice_for_remove(call):
-
-    """Обрабатывает выбор изменения данных в заявке на снятие выговора"""
-
-    if call.data == 'edit_remove_nickname':
-
-        bot.send_message(call.message.chat.id, "Введите ваш ник и ранг заново.")
-
-        user_states[call.message.chat.id]['state'] = 'edit_nickname'
-
-    elif call.data == 'edit_remove_proof':
-
-        bot.send_message(call.message.chat.id, "Отправьте доказательства заново (фото или видео).")
-
-        user_states[call.message.chat.id]['media'] = []  # Очищаем медиа для нового файла
-
-        user_states[call.message.chat.id]['state'] = 'edit_removee_proof'  # Устанавливаем статус для снятия выговора
-
-
-
-
-
-@bot.message_handler(func=lambda message: user_states.get(message.chat.id, {}).get('state') == 'edit_nickname')
-
-def handle_edit_nickname_warning(message):
-
-    user_states[message.chat.id]['nickname'] = message.text
-
-    user_states[message.chat.id]['state'] = 'waiting_for_remove_proof'
-
-    send_remove_confirmation(message)
-
-
-
-
-
-@bot.message_handler(
-
-    func=lambda message: user_states.get(message.chat.id, {}).get('state') == 'edit_complaint_nickname')
-
-def handle_edit_nickname_complaint(message):
-
-    user_states[message.chat.id]['nickname'] = message.text
-
-    user_states[message.chat.id]['state'] = 'waiting_for_proof'
-
-    send_complaint_confirmation(message)
-
-
-
-
-
-
-
-def start_remove_warning(message):
-
-    bot.send_message(message.chat.id, "Отлично, напишите ваш ник и ранг.")
-
-    user_states[message.chat.id]['state'] = 'waiting_for_remove_nickname'  # Устанавливаем правильное состояние
-
-
-
-@bot.message_handler(func=lambda message: user_states.get(message.chat.id, {}).get('state') == 'waiting_for_remove_nickname')
-
-def handle_remove_nickname(message):
-
-    user_states[message.chat.id]['nickname'] = message.text
-
-    bot.send_message(message.chat.id, "Отлично, отправьте фото или видео проделанной работы.")
-
-    user_states[message.chat.id]['state'] = 'waiting_for_remove_proof'  # Обновляем состояние
-
-
-
-@bot.message_handler(func=lambda message: user_states.get(message.chat.id, {}).get('state') == 'waiting_for_remove_proof')
-
-def handle_remove_proof(message):
-
-    if not message.photo and not message.video:
-
-        bot.send_message(message.chat.id, "Мы принимаем только фото или видео.")
-
-    else:
-
-        user_states[message.chat.id]['media'].append(message.photo or message.video)
-
-        bot.send_message(message.chat.id, "Фото получено. Если хотите добавить ещё, отправьте.")
-
-        if len(user_states[message.chat.id]['media']) >= 1:
-
-            bot.send_message(message.chat.id, "Когда закончите, нажмите кнопку 'Проверить данные'.", reply_markup=create_send_complaint_button())
-
-
-
-@bot.callback_query_handler(func=lambda call: True)
-
-def handle_callback(call):
-
-    if call.data == 'start_complaint':
-
-        start_complaint(call.message)
-
-    elif call.data == 'start_remove_warning':
-
-        start_remove_warning(call.message)  # Убедитесь, что правильно вызываете функцию
-
-
-
-def create_remove_confirm_buttons():
-
-    markup = types.InlineKeyboardMarkup()
-
-    markup.add(
-
-        types.InlineKeyboardButton("Да, все верно", callback_data='confirm_yes'),
-
-        types.InlineKeyboardButton("Изменить ник и ранг", callback_data='edit_remove_nickname'),
-
-        types.InlineKeyboardButton("Изменить фото/видео", callback_data='edit_remove_proof')
-
-    )
-
-    return markup
-
-
-
-# Остальные функции остаются такими же, как в предыдущем коде
-
-
-
-
-
-def handle_edit_choice(call):
-
-    """Обрабатывает выбор изменения данных пользователем"""
-
-    if call.data == 'edit_nickname':
-
-        bot.send_message(call.message.chat.id, "Введите ваш ник и ранг заново.")
-
-        user_states[call.message.chat.id]['state'] = 'edit_complaint_nickname'  # Изменено
-
-    elif call.data == 'edit_offender':
-
-        bot.send_message(call.message.chat.id, "Введите ник нарушителя заново.")
-
-        user_states[call.message.chat.id]['state'] = 'edit_offender'
-
-    elif call.data == 'edit_complaint':
-
-        bot.send_message(call.message.chat.id, "Опишите жалобу заново.")
-
-        user_states[call.message.chat.id]['state'] = 'edit_complaint'
-
-    elif call.data == 'edit_proof':
-
-        bot.send_message(call.message.chat.id, "Отправьте доказательства заново (фото или видео).")
-
-        user_states[call.message.chat.id]['media'] = []  # Очищаем медиа для нового файла
-
-        user_states[call.message.chat.id]['state'] = 'edit_proof'
-
-
-
-@bot.message_handler(func=lambda message: user_states.get(message.chat.id, {}).get('state') == 'edit_nickname')
-
-def handle_edit_nickname(message):
-
-    user_states[message.chat.id]['nickname'] = message.text
-
-    send_complaint_confirmation(message)
-
-
-
-
-
-@bot.message_handler(func=lambda message: user_states.get(message.chat.id, {}).get('state') == 'edit_offender')
-
-def handle_edit_offender(message):
-
-    user_states[message.chat.id]['offender_nickname'] = message.text
-
-    send_complaint_confirmation(message)
-
-
-
-
-
-@bot.message_handler(func=lambda message: user_states.get(message.chat.id, {}).get('state') == 'edit_complaint')
-
-def handle_edit_complaint(message):
-
-    user_states[message.chat.id]['complaint'] = message.text
-
-    send_complaint_confirmation(message)
-
-
-
-@bot.message_handler(content_types=['photo', 'video'],
-
-                     func=lambda message: user_states.get(message.chat.id, {}).get('state') == 'edit_proof')
-
-def handle_edit_proof_submission(message):
-
-    """Обрабатывает отправку новых фото/видео для заявки на жалобу"""
-
-    if not isinstance(user_states[message.chat.id]['media'], list):
-
-        user_states[message.chat.id]['media'] = []
-
-
-
-    if message.photo:
-
-        user_states[message.chat.id]['media'].append(message.photo[-1].file_id)
-
-    elif message.video:
-
-        user_states[message.chat.id]['media'].append(message.video.file_id)
-
-    send_complaint_confirmation(message)
-
-
-
-
-
-
-
-def start_complaint(message):
-
-    bot.send_message(message.chat.id, "Введите ваш ник и ранг (например, Nick_Name (Ранг)).")
-
-    user_states[message.chat.id]['state'] = 'waiting_for_nickname'
-
-
-
-
-
-def start_remove_warning(message):
-
-    bot.send_message(message.chat.id, "Отлично, напишите ваш ник и ранг.")
-
-    user_states[message.chat.id]['state'] = 'waiting_for_remove_nickname'
-
-
-
-
-
-def start_claim_prize(message):
-
-    bot.send_message(message.chat.id, "Отлично, чтобы получить приз, напишите свой ник и ранг.")
-
-    user_states[message.chat.id]['state'] = 'waiting_for_prize_nickname'
-
-
-
-
-
-def show_leaders_info(message):
-
-    leaders_info = ("Daniel_Larusso (https://t.me/larusso_daniel) — Даниель Ларуссо\n"
-
-                    "Evgen_Larusso (https://t.me/zeka955) — Жека")
-
-    bot.send_message(message.chat.id, leaders_info)
-
-
-
-
-
-@bot.message_handler(
-
-    func=lambda message: user_states.get(message.chat.id, {}).get('state') == 'waiting_for_prize_nickname')
-
-def handle_prize_nickname(message):
-
-    user_states[message.chat.id]['nickname'] = message.text
-
-    bot.send_message(message.chat.id, "Супер, теперь напишите свой билет, когда вы принимали участие в конкурсе.")
-
-    user_states[message.chat.id]['state'] = 'waiting_for_ticket'
-
-
-
-
-
-@bot.message_handler(func=lambda message: user_states.get(message.chat.id, {}).get('state') == 'waiting_for_ticket')
-
-def handle_ticket(message):
-
-    user_states[message.chat.id]['ticket'] = message.text
-
-    markup = types.InlineKeyboardMarkup()
-
-    markup.add(types.InlineKeyboardButton('В главное меню', callback_data='go_to_main_menu'))
-
-    bot.send_message(message.chat.id,
-
-                     "Спасибо за заявку на получение приза, ожидайте, вам скоро напишут в личные сообщения.",
-
-                     reply_markup=markup)
-
-    send_prize_claim_to_admin(message)
-
-
-
-
-
-def send_prize_claim_to_admin(message):
-
-    state = user_states[message.chat.id]
-
-    prize_claim_details = (f"Заявка на получение приза от @{message.chat.username}\n"
-
-                           f"Ник и ранг: {state['nickname']}\n"
-
-                           f"Билет: {state['ticket']}")
-
-    bot.send_message(ADMIN_CHAT_ID, prize_claim_details)
-
-
-
-
-
-@bot.callback_query_handler(func=lambda call: call.data == 'go_to_main_menu')
-
-def go_to_main_menu(call):
-
-    bot.send_message(call.message.chat.id, "Вернитесь в главное меню, нажав /start.")
-
-
-
-
-
-@bot.message_handler(func=lambda message: user_states.get(message.chat.id, {}).get('state') == 'waiting_for_nickname')
-
-def handle_nickname(message):
-
-    user_states[message.chat.id]['nickname'] = message.text
-
-    bot.send_message(message.chat.id, "Теперь введите ник нарушителя.")
-
-    user_states[message.chat.id]['state'] = 'waiting_for_offender_nickname'
-
-
-
-@bot.message_handler(func=lambda message: user_states.get(message.chat.id, {}).get('state') == 'waiting_for_offender_nickname')
-
-def handle_offender_nickname(message):
-
-    user_states[message.chat.id]['offender_nickname'] = message.text
-
-    bot.send_message(message.chat.id, "Теперь опишите происшествие.")
-
-    user_states[message.chat.id]['state'] = 'waiting_for_complaint'
-
-
-
-@bot.message_handler(func=lambda message: user_states.get(message.chat.id, {}).get('state') == 'waiting_for_complaint')
-
-def handle_complaint(message):
-
-    user_states[message.chat.id]['complaint'] = message.text
-
-    bot.send_message(message.chat.id, "Отлично, скиньте доказательства (фото или видео). Мы принимаем фото или видео.", reply_markup=create_no_proof_button())
-
-    user_states[message.chat.id]['state'] = 'waiting_for_proof'
-
-
-
-
-
-@bot.message_handler(content_types=['photo', 'video'],
-
-                     func=lambda message: user_states.get(message.chat.id, {}).get('state') == 'waiting_for_proof')
-
-def handle_proof(message):
-
-    if not isinstance(user_states[message.chat.id]['media'], list):
-
-        user_states[message.chat.id]['media'] = []
-
-    if message.photo:
-
-        user_states[message.chat.id]['media'].append(message.photo[-1].file_id)
-
-        bot.send_message(message.chat.id, "Фото получено. Если хотите добавить ещё, отправьте.")
-
-    elif message.video:
-
-        user_states[message.chat.id]['media'].append(message.video.file_id)
-
-        bot.send_message(message.chat.id, "Видео получено. Если хотите добавить ещё, отправьте.")
-
-    if len(user_states[message.chat.id]['media']) >= 1:
-
-        bot.send_message(message.chat.id, "Когда закончите, нажмите кнопку 'Проверить данные'.", reply_markup=create_send_complaint_button())
-
-
-
-
-
-
-
-@bot.message_handler(func=lambda message: user_states.get(message.chat.id, {}).get('state') == 'waiting_for_proof')
-
-def handle_wrong_proof_format(message):
-
-    bot.send_message(message.chat.id, "Мы принимаем только фото или видео.")
-
-
-
-@bot.message_handler(func=lambda message: user_states.get(message.chat.id, {}).get('state') == 'waiting_for_remove_nickname')
-
-def handle_remove_nickname(message):
-
-    user_states[message.chat.id]['nickname'] = message.text
-
-    bot.send_message(message.chat.id, "Отлично, отправите фото или видео проделанной работы.")
-
-    user_states[message.chat.id]['state'] = 'waiting_for_remove_proof'
-
-
-
-@bot.message_handler(content_types=['photo', 'video'],
-
-                     func=lambda message: user_states.get(message.chat.id, {}).get('state') == 'waiting_for_remove_proof')
-
-def handle_remove_proof(message):
-
-    if not isinstance(user_states[message.chat.id]['media'], list):
-
-        user_states[message.chat.id]['media'] = []
-
-    if message.photo:
-
-        user_states[message.chat.id]['media'].append(message.photo[-1].file_id)
-
-        bot.send_message(message.chat.id, "Фото получено. Если хотите добавить ещё, отправьте.")
-
-    elif message.video:
-
-        user_states[message.chat.id]['media'].append(message.video.file_id)
-
-        bot.send_message(message.chat.id, "Видео получено. Если хотите добавить ещё, отправьте.")
-
-    if len(user_states[message.chat.id]['media']) >= 1:
-
-        bot.send_message(message.chat.id, "Когда закончите, нажмите кнопку 'Проверить данные'.", reply_markup=create_send_complaint_button())
-
-
-
-@bot.message_handler(func=lambda message: user_states.get(message.chat.id, {}).get('state') == 'waiting_for_remove_proof')
-
-def handle_remove_wrong_proof_format(message):
-
-    bot.send_message(message.chat.id, "Мы принимаем только фото или видео.")
-
-
-
-def create_send_complaint_button():
-
-    markup = types.InlineKeyboardMarkup()
-
-    markup.add(types.InlineKeyboardButton('Проверить данные', callback_data='test_callback'))
-
-    return markup
-
-
-
-def handle_confirmation(call):
-
-    if call.data == 'confirm_yes':
-
-        # Проверка на тип заявки: жалоба или снятие выговора
-
-        if user_states[call.message.chat.id]['state'] == 'waiting_for_remove_proof':
-
-            # Отправка уведомления админу о новой заявке на снятие выговора
-
-            remove_request_details = (f"Новая заявка на снятие выговора от @{call.message.chat.username}\n"
-
-                                      f"Ник и ранг: {user_states[call.message.chat.id]['nickname']}\n"
-
-                                      f"Доказательства: {'Приложены' if user_states[call.message.chat.id]['media'] else 'Нет'}")
-
-            bot.send_message(ADMIN_CHAT_ID, remove_request_details)
-
-            if user_states[call.message.chat.id]['media']:
-
-                for media_file in user_states[call.message.chat.id]['media']:
-
-                    try:
-
-                        bot.send_photo(ADMIN_CHAT_ID, media_file)
-
-                    except:
-
-                        bot.send_video(ADMIN_CHAT_ID, media_file)
-
-            # Подтверждение отправки заявки пользователю
-
-            bot.send_message(call.message.chat.id,
-
-                             "Спасибо за вашу заявку на снятие выговора. Ожидайте, вам скоро напишут в личные сообщения.",
-
-                                          reply_markup=create_main_menu_button())
-
-        else:  # Это жалоба
-
-            # Отправка обычной жалобы админу
-
-            complaint_details = (f"Новая жалоба от @{call.message.chat.username}\n"
-
-                                 f"Ник и ранг: {user_states[call.message.chat.id]['nickname']}\n"
-
-                                 f"Ник нарушителя: {user_states[call.message.chat.id]['offender_nickname']}\n"
-
-                                 f"Описание жалобы: {user_states[call.message.chat.id]['complaint']}\n"
-
-                                 f"Доказательства: {'Приложены' if user_states[call.message.chat.id]['media'] else 'Нет'}")
-
-            bot.send_message(ADMIN_CHAT_ID, complaint_details)
-
-            if user_states[call.message.chat.id]['media']:
-
-                for media_file in user_states[call.message.chat.id]['media']:
-
-                    try:
-
-                        bot.send_photo(ADMIN_CHAT_ID, media_file)
-
-                    except:
-
-                        bot.send_video(ADMIN_CHAT_ID, media_file)
-
-            bot.send_message(call.message.chat.id, "Жалоба отправлена. Спасибо!",
-
-                             reply_markup=create_main_menu_button())
-
-
-
-        # Очистка данных пользователя
-
-        del user_states[call.message.chat.id]
-
-
-
-    else:
-
-        # Отображаем разные кнопки в зависимости от типа заявки
-
-        if user_states[call.message.chat.id]['state'] == 'waiting_for_remove_proof':
-
-            bot.send_message(call.message.chat.id, "Что вы хотите изменить?",
-
-                             reply_markup=create_remove_confirm_buttons())
-
-        else:
-
-            user_states[call.message.chat.id]['state'] = 'waiting_for_edit_choice'
-
-            bot.send_message(call.message.chat.id, "Что вы хотите изменить?",
-
-                             reply_markup=create_edit_buttons())
-
-
-
-
-
-
-
-
-
-def create_confirm_buttons():
-
-    markup = types.InlineKeyboardMarkup()
-
-    markup.add(
-
-        types.InlineKeyboardButton('Да, всё верно', callback_data='confirm_yes'),
-
-        types.InlineKeyboardButton('Нет, хочу исправить', callback_data='confirm_no')
-
-    )
-
-    return markup
-
-
-
-
-
-def create_no_proof_button():
-
-    markup = types.InlineKeyboardMarkup()
-
-    markup.add(types.InlineKeyboardButton('Нету', callback_data='no_proof'))
-
-    return markup
-
-
-
-def create_edit_buttons():
-
-    markup = types.InlineKeyboardMarkup()
-
-    markup.add(
-
-        types.InlineKeyboardButton('Ваш ник и ранг', callback_data='edit_nickname'),
-
-        types.InlineKeyboardButton('Ник нарушителя', callback_data='edit_offender'),
-
-        types.InlineKeyboardButton('Описание', callback_data='edit_complaint'),
-
-        types.InlineKeyboardButton('Фото/Видео', callback_data='edit_proof')
-
-    )
-
-    return markup
-
-
-
-def create_main_menu_button():
-
-    markup = types.InlineKeyboardMarkup()
-
-    markup.add(types.InlineKeyboardButton('Вернуться в главное меню', callback_data='start_complaint'))
-
-    return markup
-
-
-
-bot.remove_webhook()
-
-bot.polling(none_stop=True, interval=0)
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система жалоб</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .complaint-item {
+            padding: 15px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .complaint-status {
+            font-weight: bold;
+            color: #555;
+        }
+
+        #stats {
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f7f7f7;
+            border-radius: 4px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Форма для пользователей -->
+    <div class="container" id="user-form">
+        <h2>Подача жалобы</h2>
+        <form id="complaint-form">
+            <label for="user-nick">Ваш ник:</label>
+            <input type="text" id="user-nick" placeholder="Ваш ник" required>
+            <label for="violator-nick">Ник нарушителя:</label>
+            <input type="text" id="violator-nick" placeholder="Ник нарушителя" required>
+            <label for="description">Описание нарушения:</label>
+            <textarea id="description" rows="5" placeholder="Опишите ситуацию" required></textarea>
+            <label for="evidence">Доказательства:</label>
+            <input type="file" id="evidence" accept="image/*">
+            <button type="submit">Отправить жалобу</button>
+        </form>
+    </div>
+
+    <!-- Панель администратора -->
+    <div class="container hidden" id="admin-panel">
+        <h2>Панель администратора</h2>
+        <div id="stats"></div>
+        <div id="complaint-list"></div>
+    </div>
+
+    <script>
+        let complaints = JSON.parse(localStorage.getItem("complaints")) || [];
+        let currentUser = null;
+
+        // Обработка формы жалобы
+        document.getElementById("complaint-form").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const userNick = document.getElementById("user-nick").value;
+            const violatorNick = document.getElementById("violator-nick").value;
+            const description = document.getElementById("description").value;
+            const evidenceFile = document.getElementById("evidence").files[0];
+
+            // Обработка изображения (если выбрано)
+            if (evidenceFile) {
+                const reader = new FileReader();
+                reader.onload = function () {
+                    const evidence = reader.result;
+
+                    // Добавляем жалобу в массив
+                    complaints.push({
+                        userNick,
+                        violatorNick,
+                        description,
+                        evidence,
+                        status: "На рассмотрении",
+                        timestamp: new Date().toISOString()
+                    });
+
+                    localStorage.setItem("complaints", JSON.stringify(complaints));
+                    alert("Жалоба отправлена!");
+                    document.getElementById("complaint-form").reset();
+                };
+                reader.readAsDataURL(evidenceFile);
+            } else {
+                // Добавляем жалобу без изображения
+                complaints.push({
+                    userNick,
+                    violatorNick,
+                    description,
+                    evidence: null,
+                    status: "На рассмотрении",
+                    timestamp: new Date().toISOString()
+                });
+
+                localStorage.setItem("complaints", JSON.stringify(complaints));
+                alert("Жалоба отправлена!");
+                document.getElementById("complaint-form").reset();
+            }
+        });
+
+        // Показать админ-панель
+        function showAdminPanel() {
+            document.getElementById("user-form").classList.add("hidden");
+            document.getElementById("admin-panel").classList.remove("hidden");
+            renderComplaints();
+            renderStats();
+        }
+
+        // Отрисовка списка жалоб
+        function renderComplaints() {
+            const complaintList = document.getElementById("complaint-list");
+            complaintList.innerHTML = "";
+
+            complaints.forEach((complaint, index) => {
+                const complaintItem = document.createElement("div");
+                complaintItem.classList.add("complaint-item");
+
+                complaintItem.innerHTML = `
+                    <p><strong>От:</strong> ${complaint.userNick}</p>
+                    <p><strong>Нарушитель:</strong> ${complaint.violatorNick}</p>
+                    <p><strong>Описание:</strong> ${complaint.description}</p>
+                    ${
+                        complaint.evidence
+                            ? `<p><strong>Доказательства:</strong><br><img src="${complaint.evidence}" alt="Доказательство"></p>`
+                            : "<p><strong>Доказательства:</strong> Нет</p>"
+                    }
+                    <p class="complaint-status"><strong>Статус:</strong> ${complaint.status}</p>
+                    <button onclick="updateComplaint(${index}, 'Одобрено')">Одобрить</button>
+                    <button onclick="updateComplaint(${index}, 'Отклонено')">Отклонить</button>
+                    <button onclick="deleteComplaint(${index})">Удалить</button>
+                `;
+
+                complaintList.appendChild(complaintItem);
+            });
+        }
+
+        // Обновление статуса жалобы
+        function updateComplaint(index, status) {
+            complaints[index].status = status;
+            localStorage.setItem("complaints", JSON.stringify(complaints));
+            renderComplaints();
+            renderStats();
+        }
+
+        // Удаление жалобы
+        function deleteComplaint(index) {
+            complaints.splice(index, 1);
+            localStorage.setItem("complaints", JSON.stringify(complaints));
+            renderComplaints();
+            renderStats();
+        }
+
+        // Отображение статистики
+        function renderStats() {
+            const totalComplaints = complaints.length;
+            const approvedComplaints = complaints.filter(c => c.status === 'Одобрено').length;
+            const rejectedComplaints = complaints.filter(c => c.status === 'Отклонено').length;
+
+            const stats = document.getElementById("stats");
+            stats.innerHTML = `
+                <p>Всего жалоб: ${totalComplaints}</p>
+                <p>Одобрено: ${approvedComplaints}</p>
+                <p>Отклонено: ${rejectedComplaints}</p>
+            `;
+        }
+
+        // Вход для администратора (демо)
+        if (prompt("Введите пароль администратора:") === "admin123") {
+            showAdminPanel();
+        }
+    </script>
+</body>
+</html>
