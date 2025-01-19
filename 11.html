@@ -13,7 +13,7 @@
             background: #f4f4f4;
         }
         .container {
-            max-width: 600px;
+            max-width: 800px;
             margin: 50px auto;
             padding: 20px;
             background: #fff;
@@ -63,6 +63,37 @@
         .admin-icon:hover {
             background-color: #45a049;
         }
+        .complaint-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f9f9f9;
+        }
+        .complaint-card p {
+            margin: 5px 0;
+        }
+        .complaint-card img {
+            display: block;
+            margin: 5px 0;
+            max-width: 100px;
+        }
+        .complaint-card button {
+            margin-right: 10px;
+        }
+        .status {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .status.approved {
+            color: green;
+        }
+        .status.denied {
+            color: red;
+        }
+        .status.pending {
+            color: orange;
+        }
     </style>
 </head>
 <body>
@@ -111,7 +142,6 @@
     <!-- Панель администратора -->
     <div class="container hidden" id="admin-panel">
         <h2>Панель администратора</h2>
-        <div id="stats"></div>
         <div id="complaint-list"></div>
     </div>
 
@@ -174,14 +204,24 @@
         function renderComplaints() {
             const list = document.getElementById("complaint-list");
             list.innerHTML = complaints.map((c, i) => `
-                <div>
-                    <p>Тип: ${c.type === "complaint" ? "Жалоба" : "Снятие выговора"}</p>
-                    <p>${c.userNick || c.playerNick}</p>
-                    <p>${c.description || c.workDone}</p>
-                    ${c.evidence.map(e => `<img src="${e}" alt="Доказательство" width="100">`).join("")}
+                <div class="complaint-card">
+                    <p><strong>Тип:</strong> ${c.type === "complaint" ? "Жалоба" : "Снятие выговора"}</p>
+                    <p><strong>Ник:</strong> ${c.userNick || c.playerNick}</p>
+                    <p><strong>Описание:</strong> ${c.description || c.workDone}</p>
+                    ${c.evidence.map(e => `<img src="${e}" alt="Доказательство">`).join("")}
+                    <div class="status ${c.status.toLowerCase()}"><strong>Статус:</strong> ${c.status}</div>
+                    <button onclick="updateStatus(${i}, 'Одобрено')">Одобрить</button>
+                    <button onclick="updateStatus(${i}, 'Отказано')">Отказать</button>
                 </div>
             `).join("");
         }
+
+        // Обновление статуса жалобы
+        function updateStatus(index, status) {
+            complaints[index].status = status;
+            localStorage.setItem("complaints", JSON.stringify(complaints));
+            renderComplaints();
+        }
     </script>
 </body>
-                    </html>
+</html>
