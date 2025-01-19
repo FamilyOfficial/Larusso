@@ -13,7 +13,7 @@
             background: #f4f4f4;
         }
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 50px auto;
             padding: 20px;
             background: #fff;
@@ -77,6 +77,13 @@
             display: block;
             margin: 5px 0;
             max-width: 100px;
+            height: auto;
+        }
+        .complaint-card .evidence {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
         }
         .complaint-card button {
             margin-right: 10px;
@@ -206,9 +213,11 @@
             list.innerHTML = complaints.map((c, i) => `
                 <div class="complaint-card">
                     <p><strong>Тип:</strong> ${c.type === "complaint" ? "Жалоба" : "Снятие выговора"}</p>
-                    <p><strong>Ник:</strong> ${c.userNick || c.playerNick}</p>
+                    <p><strong>От:</strong> ${c.userNick || c.playerNick}</p>
                     <p><strong>Описание:</strong> ${c.description || c.workDone}</p>
-                    ${c.evidence.map(e => `<img src="${e}" alt="Доказательство">`).join("")}
+                    <div class="evidence">
+                        ${c.evidence.map(e => `<img src="${e}" alt="Доказательство">`).join("")}
+                    </div>
                     <div class="status ${c.status.toLowerCase()}"><strong>Статус:</strong> ${c.status}</div>
                     <button onclick="updateStatus(${i}, 'Одобрено')">Одобрить</button>
                     <button onclick="updateStatus(${i}, 'Отказано')">Отказать</button>
