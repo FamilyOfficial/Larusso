@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Система жалоб</title>
     <style>
+        /* Основные стили */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             background: #f4f4f4;
         }
-
         .container {
             max-width: 600px;
             margin: 50px auto;
@@ -20,19 +20,11 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-
         h2 {
             text-align: center;
             margin-bottom: 20px;
         }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-
-        input, textarea, button {
+        input, textarea, button, select {
             width: 100%;
             padding: 10px;
             margin-bottom: 15px;
@@ -40,64 +32,80 @@
             border-radius: 4px;
             font-size: 16px;
         }
-
         button {
             background-color: #4caf50;
             color: #fff;
             cursor: pointer;
             transition: background-color 0.3s;
         }
-
         button:hover {
             background-color: #45a049;
         }
-
-        .complaint-item {
-            padding: 15px;
-            background: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
-
-        .complaint-status {
-            font-weight: bold;
-            color: #555;
-        }
-
-        #stats {
-            margin-bottom: 20px;
-            padding: 10px;
-            background: #f7f7f7;
-            border-radius: 4px;
-        }
-
         .hidden {
             display: none;
         }
-
-        img {
-            max-width: 100%;
-            height: auto;
-            margin-top: 10px;
+        .admin-icon {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            background-color: #4caf50;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .admin-icon:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
+    <!-- Значок администратора -->
+    <div class="admin-icon" id="admin-icon" title="Админ">A</div>
+
     <!-- Форма для пользователей -->
     <div class="container" id="user-form">
-        <h2>Подача жалобы</h2>
-        <form id="complaint-form">
-            <label for="user-nick">Ваш ник:</label>
-            <input type="text" id="user-nick" placeholder="Ваш ник" required>
-            <label for="violator-nick">Ник нарушителя:</label>
-            <input type="text" id="violator-nick" placeholder="Ник нарушителя" required>
-            <label for="description">Описание нарушения:</label>
-            <textarea id="description" rows="5" placeholder="Опишите ситуацию" required></textarea>
-            <label for="evidence">Доказательства:</label>
-            <input type="file" id="evidence" accept="image/*">
-            <button type="submit">Отправить жалобу</button>
-        </form>
+        <h2>Выберите тип формы</h2>
+        <select id="form-type">
+            <option value="complaint">Жалоба</option>
+            <option value="remove-warning">Снятие выговора</option>
+        </select>
+
+        <div id="complaint-form-container">
+            <h2>Подача жалобы</h2>
+            <form id="complaint-form">
+                <label for="user-nick">Ваш ник:</label>
+                <input type="text" id="user-nick" placeholder="Ваш ник" required>
+                <label for="violator-nick">Ник нарушителя:</label>
+                <input type="text" id="violator-nick" placeholder="Ник нарушителя" required>
+                <label for="description">Описание нарушения:</label>
+                <textarea id="description" rows="5" placeholder="Опишите ситуацию" required></textarea>
+                <label for="evidence">Доказательства:</label>
+                <input type="file" id="evidence" accept="image/*" multiple>
+                <button type="submit">Отправить жалобу</button>
+            </form>
+        </div>
+
+        <div id="remove-warning-form-container" class="hidden">
+            <h2>Запрос на снятие выговора</h2>
+            <form id="remove-warning-form">
+                <label for="player-nick">Ваш игровой никнейм:</label>
+                <input type="text" id="player-nick" placeholder="Ваш ник" required>
+                <label for="player-rank">Ваш ранг в семье:</label>
+                <input type="text" id="player-rank" placeholder="Ваш ранг" required>
+                <label for="work-done">Пройденная работа:</label>
+                <textarea id="work-done" rows="5" placeholder="Опишите, что вы сделали" required></textarea>
+                <label for="evidence-warning">Доказательства:</label>
+                <input type="file" id="evidence-warning" accept="image/*" multiple>
+                <button type="submit">Отправить запрос</button>
+            </form>
+        </div>
     </div>
 
     <!-- Панель администратора -->
@@ -109,52 +117,49 @@
 
     <script>
         let complaints = JSON.parse(localStorage.getItem("complaints")) || [];
-        let currentUser = null;
 
-        // Обработка формы жалобы
+        // Переключение форм
+        document.getElementById("form-type").addEventListener("change", function () {
+            const type = this.value;
+            document.getElementById("complaint-form-container").classList.toggle("hidden", type !== "complaint");
+            document.getElementById("remove-warning-form-container").classList.toggle("hidden", type !== "remove-warning");
+        });
+
+        // Обработка жалоб
         document.getElementById("complaint-form").addEventListener("submit", function (event) {
             event.preventDefault();
-
             const userNick = document.getElementById("user-nick").value;
             const violatorNick = document.getElementById("violator-nick").value;
             const description = document.getElementById("description").value;
-            const evidenceFile = document.getElementById("evidence").files[0];
+            const evidence = Array.from(document.getElementById("evidence").files).map(file => URL.createObjectURL(file));
 
-            // Обработка изображения (если выбрано)
-            if (evidenceFile) {
-                const reader = new FileReader();
-                reader.onload = function () {
-                    const evidence = reader.result;
+            complaints.push({ type: "complaint", userNick, violatorNick, description, evidence, status: "На рассмотрении" });
+            localStorage.setItem("complaints", JSON.stringify(complaints));
+            alert("Жалоба отправлена!");
+            this.reset();
+        });
 
-                    // Добавляем жалобу в массив
-                    complaints.push({
-                        userNick,
-                        violatorNick,
-                        description,
-                        evidence,
-                        status: "На рассмотрении",
-                        timestamp: new Date().toISOString()
-                    });
+        // Обработка снятия выговоров
+        document.getElementById("remove-warning-form").addEventListener("submit", function (event) {
+            event.preventDefault();
+            const playerNick = document.getElementById("player-nick").value;
+            const playerRank = document.getElementById("player-rank").value;
+            const workDone = document.getElementById("work-done").value;
+            const evidence = Array.from(document.getElementById("evidence-warning").files).map(file => URL.createObjectURL(file));
 
-                    localStorage.setItem("complaints", JSON.stringify(complaints));
-                    alert("Жалоба отправлена!");
-                    document.getElementById("complaint-form").reset();
-                };
-                reader.readAsDataURL(evidenceFile);
+            complaints.push({ type: "remove-warning", playerNick, playerRank, workDone, evidence, status: "На рассмотрении" });
+            localStorage.setItem("complaints", JSON.stringify(complaints));
+            alert("Запрос отправлен!");
+            this.reset();
+        });
+
+        // Вход в админ-панель
+        document.getElementById("admin-icon").addEventListener("click", function () {
+            const password = prompt("Введите пароль администратора:");
+            if (password === "admin123") {
+                showAdminPanel();
             } else {
-                // Добавляем жалобу без изображения
-                complaints.push({
-                    userNick,
-                    violatorNick,
-                    description,
-                    evidence: null,
-                    status: "На рассмотрении",
-                    timestamp: new Date().toISOString()
-                });
-
-                localStorage.setItem("complaints", JSON.stringify(complaints));
-                alert("Жалоба отправлена!");
-                document.getElementById("complaint-form").reset();
+                alert("Неверный пароль!");
             }
         });
 
@@ -163,71 +168,20 @@
             document.getElementById("user-form").classList.add("hidden");
             document.getElementById("admin-panel").classList.remove("hidden");
             renderComplaints();
-            renderStats();
         }
 
-        // Отрисовка списка жалоб
+        // Отображение жалоб и запросов
         function renderComplaints() {
-            const complaintList = document.getElementById("complaint-list");
-            complaintList.innerHTML = "";
-
-            complaints.forEach((complaint, index) => {
-                const complaintItem = document.createElement("div");
-                complaintItem.classList.add("complaint-item");
-
-                complaintItem.innerHTML = `
-                    <p><strong>От:</strong> ${complaint.userNick}</p>
-                    <p><strong>Нарушитель:</strong> ${complaint.violatorNick}</p>
-                    <p><strong>Описание:</strong> ${complaint.description}</p>
-                    ${
-                        complaint.evidence
-                            ? `<p><strong>Доказательства:</strong><br><img src="${complaint.evidence}" alt="Доказательство"></p>`
-                            : "<p><strong>Доказательства:</strong> Нет</p>"
-                    }
-                    <p class="complaint-status"><strong>Статус:</strong> ${complaint.status}</p>
-                    <button onclick="updateComplaint(${index}, 'Одобрено')">Одобрить</button>
-                    <button onclick="updateComplaint(${index}, 'Отклонено')">Отклонить</button>
-                    <button onclick="deleteComplaint(${index})">Удалить</button>
-                `;
-
-                complaintList.appendChild(complaintItem);
-            });
-        }
-
-        // Обновление статуса жалобы
-        function updateComplaint(index, status) {
-            complaints[index].status = status;
-            localStorage.setItem("complaints", JSON.stringify(complaints));
-            renderComplaints();
-            renderStats();
-        }
-
-        // Удаление жалобы
-        function deleteComplaint(index) {
-            complaints.splice(index, 1);
-            localStorage.setItem("complaints", JSON.stringify(complaints));
-            renderComplaints();
-            renderStats();
-        }
-
-        // Отображение статистики
-        function renderStats() {
-            const totalComplaints = complaints.length;
-            const approvedComplaints = complaints.filter(c => c.status === 'Одобрено').length;
-            const rejectedComplaints = complaints.filter(c => c.status === 'Отклонено').length;
-
-            const stats = document.getElementById("stats");
-            stats.innerHTML = `
-                <p>Всего жалоб: ${totalComplaints}</p>
-                <p>Одобрено: ${approvedComplaints}</p>
-                <p>Отклонено: ${rejectedComplaints}</p>
-            `;
-        }
-
-        // Вход для администратора (демо)
-        if (prompt("Введите пароль администратора:") === "admin123") {
-            showAdminPanel();
+            const list = document.getElementById("complaint-list");
+            list.innerHTML = complaints.map((c, i) => `
+                <div>
+                    <p>Тип: ${c.type === "complaint" ? "Жалоба" : "Снятие выговора"}</p>
+                    <p>${c.userNick || c.playerNick}</p>
+                    <p>${c.description || c.workDone}</p>
+                    ${c.evidence.map(e => `<img src="${e}" alt="Доказательство" width="100">`).join("")}
+                </div>
+            `).join("");
         }
     </script>
 </body>
-</html>
+                    </html>
