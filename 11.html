@@ -78,6 +78,7 @@
             margin: 5px 0;
             max-width: 100px;
             height: auto;
+            cursor: pointer;
         }
         .complaint-card .evidence {
             display: flex;
@@ -103,6 +104,31 @@
         .status.pending {
             color: orange;
             animation: fadeIn 1s ease-out;
+        }
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal img {
+            max-width: 90%;
+            max-height: 80%;
+        }
+        .modal .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 30px;
+            color: white;
+            cursor: pointer;
         }
         /* Анимация для статуса */
         @keyframes fadeIn {
@@ -164,6 +190,12 @@
         <div id="complaint-list"></div>
     </div>
 
+    <!-- Модальное окно для просмотра изображений -->
+    <div class="modal" id="image-modal">
+        <span class="close" id="close-modal">&times;</span>
+        <img id="modal-image" src="" alt="Доказательство">
+    </div>
+
     <script>
         let complaints = JSON.parse(localStorage.getItem("complaints")) || [];
 
@@ -194,7 +226,7 @@
             const playerNick = document.getElementById("player-nick").value;
             const playerRank = document.getElementById("player-rank").value;
             const workDone = document.getElementById("work-done").value;
-            const evidence = Array.from(document.getElementById("evidence-warning").files).map(file => URL.createObjectURL(file));
+            const evidence = Array.from(document.getElementByIdconst evidence = Array.from(document.getElementById("evidence-warning").files).map(file => URL.createObjectURL(file));
 
             complaints.push({ type: "remove-warning", playerNick, playerRank, workDone, evidence, status: "На рассмотрении" });
             localStorage.setItem("complaints", JSON.stringify(complaints));
@@ -228,11 +260,12 @@
                     <p><strong>От:</strong> ${c.userNick || c.playerNick}</p>
                     <p><strong>Описание:</strong> ${c.description || c.workDone}</p>
                     <div class="evidence">
-                        ${c.evidence.map(e => `<img src="${e}" alt="Доказательство">`).join("")}
+                        ${c.evidence.map(e => `<img src="${e}" alt="Доказательство" onclick="openImageModal('${e}')">`).join("")}
                     </div>
                     <div class="status ${c.status.toLowerCase()}"><strong>Статус:</strong> ${c.status}</div>
                     <button onclick="updateStatus(${i}, 'Одобрено')">Одобрить</button>
                     <button onclick="updateStatus(${i}, 'Отказано')">Отказать</button>
+                    <button onclick="deleteComplaint(${i})">Удалить</button>
                 </div>
             `).join("");
         }
@@ -243,6 +276,27 @@
             localStorage.setItem("complaints", JSON.stringify(complaints));
             renderComplaints();
         }
+
+        // Удаление жалобы
+        function deleteComplaint(index) {
+            complaints.splice(index, 1);
+            localStorage.setItem("complaints", JSON.stringify(complaints));
+            renderComplaints();
+        }
+
+        // Открытие изображения в модальном окне
+        function openImageModal(imageSrc) {
+            const modal = document.getElementById("image-modal");
+            const modalImage = document.getElementById("modal-image");
+            modalImage.src = imageSrc;
+            modal.style.display = "flex";
+        }
+
+        // Закрытие модального окна
+        document.getElementById("close-modal").addEventListener("click", function () {
+            const modal = document.getElementById("image-modal");
+            modal.style.display = "none";
+        });
     </script>
 </body>
 </html>
