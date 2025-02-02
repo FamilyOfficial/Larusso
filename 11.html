@@ -7,99 +7,176 @@
     <style>
         /* Основные стили */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-            background: #f4f4f4;
+            background: #f0f4f8;
+            color: #333;
         }
+
         .container {
             max-width: 900px;
             margin: 50px auto;
-            padding: 20px;
+            padding: 30px;
             background: #fff;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
+
         h2 {
             text-align: center;
             margin-bottom: 20px;
+            font-size: 24px;
+            color: #4caf50;
         }
+
         input, textarea, button, select {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
+            padding: 12px;
+            margin-bottom: 20px;
             border: 1px solid #ccc;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 16px;
+            box-sizing: border-box;
         }
+
         button {
             background-color: #4caf50;
-            color: #fff;
+            color: white;
+            border: none;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s ease;
+            padding: 14px 20px;
+            font-size: 16px;
         }
+
         button:hover {
             background-color: #45a049;
         }
+
         .hidden {
             display: none;
         }
+
         .admin-icon {
             position: fixed;
-            top: 10px;
-            right: 10px;
-            width: 40px;
-            height: 40px;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
             background-color: #4caf50;
-            color: #fff;
+            color: white;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 20px;
+            font-size: 22px;
             cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
         }
+
         .admin-icon:hover {
             background-color: #45a049;
+            transform: scale(1.1);
         }
+
         .complaint-card {
             border: 1px solid #ddd;
             border-radius: 8px;
             padding: 15px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             background: #f9f9f9;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
+
         .complaint-card p {
-            margin: 5px 0;
+            margin: 8px 0;
+            font-size: 16px;
         }
+
         .complaint-card img {
             display: block;
             margin: 5px 0;
             max-width: 100px;
             height: auto;
+            border-radius: 4px;
         }
+
         .complaint-card .evidence {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             margin-top: 10px;
         }
-        .complaint-card button {
-            margin-right: 10px;
-        }
+
         .status {
             font-weight: bold;
-            margin-top: 10px;
+            margin-top: 12px;
         }
+
         .status.approved {
             color: green;
         }
+
         .status.denied {
             color: red;
         }
+
         .status.pending {
             color: orange;
+        }
+
+        /* Анимации */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .btn-status {
+            display: inline-block;
+            padding: 8px 16px;
+            margin: 5px 10px;
+            font-size: 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-approved {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .btn-approved:hover {
+            background-color: #45a049;
+        }
+
+        .btn-denied {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .btn-denied:hover {
+            background-color: #e53935;
+        }
+
+        .btn-pending {
+            background-color: #ff9800;
+            color: white;
+        }
+
+        .btn-pending:hover {
+            background-color: #fb8c00;
         }
     </style>
 </head>
@@ -108,7 +185,7 @@
     <div class="admin-icon" id="admin-icon" title="Админ">A</div>
 
     <!-- Форма для пользователей -->
-    <div class="container" id="user-form">
+    <div class="container fade-in" id="user-form">
         <h2>Выберите тип формы</h2>
         <select id="form-type">
             <option value="complaint">Жалоба</option>
@@ -219,8 +296,8 @@
                         ${c.evidence.map(e => `<img src="${e}" alt="Доказательство">`).join("")}
                     </div>
                     <div class="status ${c.status.toLowerCase()}"><strong>Статус:</strong> ${c.status}</div>
-                    <button onclick="updateStatus(${i}, 'Одобрено')">Одобрить</button>
-                    <button onclick="updateStatus(${i}, 'Отказано')">Отказать</button>
+                    <button class="btn-status btn-approved" onclick="updateStatus(${i}, 'Одобрено')">Одобрить</button>
+                    <button class="btn-status btn-denied" onclick="updateStatus(${i}, 'Отказано')">Отказать</button>
                 </div>
             `).join("");
         }
