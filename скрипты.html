@@ -82,15 +82,8 @@
   <h1>Аризона РП Скрипты</h1>
 </header>
 
-<div class="container">
-  <!-- Пример карточки скрипта -->
-  <div class="script-card">
-    <h3>Название скрипта: Пример Скрипта</h3>
-    <p>Описание: Это пример скрипта для Аризона РП.</p>
-    <a href="example-script-file.zip" download>Скачать</a>
-    <p>Скачиваний: <span id="download-count">0</span></p>
-    <button class="delete-btn" onclick="deleteScript(this)">Удалить</button>
-  </div>
+<div class="container" id="script-container">
+  <!-- Скрипты будут загружаться здесь -->
 </div>
 
 <img src="admin-icon.png" alt="Admin" class="admin-icon" onclick="showAdminMenu()">
@@ -111,12 +104,16 @@
 <script>
   let isAdmin = false; // Флаг для проверки, является ли пользователь администратором
 
+  // Загрузка сохранённых скриптов из localStorage
+  window.onload = function() {
+    loadScripts();
+  };
+
   // Показ меню администратора
   function showAdminMenu() {
     if (isAdmin) {
-      // Если пользователь уже вошёл как администратор
       document.getElementById('admin-panel').style.display = 'block';
-      document.getElementById('admin-password').style.display = 'none'; // Убираем поле пароля
+      document.getElementById('admin-password').style.display = 'none';
     }
     document.getElementById('admin-menu').style.display = 'block';
   }
@@ -124,10 +121,10 @@
   // Проверка пароля администратора
   function checkAdminPassword() {
     const password = document.getElementById('admin-password').value;
-    if (password === 'Admin123') { // Укажите ваш пароль администратора
+    if (password === 'Admin123') {
       isAdmin = true;
       document.getElementById('admin-panel').style.display = 'block';
-      document.getElementById('admin-password').style.display = 'none'; // Убираем поле пароля
+      document.getElementById('admin-password').style.display = 'none';
       showDeleteButtons(); // Показываем кнопки "Удалить"
     } else {
       alert('Неверный пароль!');
@@ -147,34 +144,67 @@
     const file = fileInput.files[0];
 
     if (name && description && file) {
-      const container = document.querySelector('.container');
-      const card = document.createElement('div');
-      card.classList.add('script-card');
-
       const fileURL = URL.createObjectURL(file);
+      const newScript = { name, description, fileURL, fileName: file.name };
 
-      card.innerHTML = `
-        <h3>Название скрипта: ${name}</h3>
-        <p>Описание: ${description}</p>
-        <a href="${fileURL}" download="${file.name}">Скачать</a>
-        <p>Скачиваний: <span>0</span></p>
-        <button class="delete-btn" onclick="deleteScript(this)">Удалить</button>
-      `;
-      container.appendChild(card);
+      saveScript(newScript); // Сохранение в localStorage
+      renderScript(newScript); // Рендер нового скрипта на странице
+
       fileInput.value = ''; // Очистка поля загрузки файла
-
-      // Закрываем меню администратора после добавления
-      closeAdminMenu();
+      closeAdminMenu(); // Закрытие меню администратора
       alert('Скрипт добавлен!');
     } else {
       alert('Заполните все поля!');
     }
   }
 
+  // Рендер скрипта на странице
+  function renderScript(script) {
+    const container = document.getElementById('script-container');
+    const card = document.createElement('div');
+    card.classList.add('script-card');
+
+    card.innerHTML = `
+      <h3>Название скрипта: ${script.name}</h3>
+      <p>Описание: ${script.description}</p>
+      <a href="${script.fileURL}" download="${script.fileName}">Скачать</a>
+      <p>Скачиваний: <span>0</span></p>
+      <button class="delete-btn" onclick="deleteScript(this)">Удалить</button>
+    `;
+
+    container.appendChild(card);
+    if (isAdmin) {
+      showDeleteButtons(); // Показываем кнопки "Удалить", если администратор вошёл
+    }
+  }
+
+  // Сохранение скрипта в localStorage
+  function saveScript(script) {
+    const scripts = JSON.parse(localStorage.getItem('scripts')) || [];
+    scripts.push(script);
+    localStorage.setItem('scripts', JSON.stringify(scripts));
+  }
+
+  // Загрузка скриптов из localStorage
+  function loadScripts() {
+    const scripts = JSON.parse(localStorage.getItem('scripts')) || [];
+    scripts.forEach(script => renderScript(script));
+  }
+
   // Удаление скрипта
   function deleteScript(button) {
     const card = button.parentElement; // Находим родительский элемент кнопки (карточку)
-    card.remove(); // Удаляем карточку
+    const scriptName = card.querySelector('h3').textContent.replace('Название скрипта: ', '');
+
+    card.remove(); // Удаляем карточку со страницы
+    removeScriptFromStorage(scriptName); // Удаляем скрипт из localStorage
+  }
+
+  // Удаление скрипта из localStorage
+  function removeScriptFromStorage(name) {
+    const scripts = JSON.parse(localStorage.getItem('scripts')) || [];
+    const updatedScripts = scripts.filter(script => script.name !== name);
+    localStorage.setItem('scripts', JSON.stringify(updatedScripts));
   }
 
   // Показ кнопок "Удалить" только для администратора
@@ -185,4 +215,4 @@
 </script>
 
 </body>
-      </html>
+</html>
