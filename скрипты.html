@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Аризона РП Скрипты</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+    }
+    header {
+      background-color: #333;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+    .container {
+      padding: 20px;
+    }
+    .script-card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      padding: 15px;
+      position: relative;
+    }
+    .script-card h3 {
+      margin-top: 0;
+    }
+    .delete-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: red;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+      display: none; /* Скрываем кнопки по умолчанию */
+    }
+    .admin-icon {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      cursor: pointer;
+    }
+    #admin-menu {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+    #admin-menu input, #admin-menu textarea, #admin-menu button {
+      margin: 10px 0;
+      padding: 10px;
+      width: 100%;
+    }
+    .close-btn {
+      background-color: #555;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Аризона РП Скрипты</h1>
+</header>
+
+<div class="container">
+  <!-- Пример карточки скрипта -->
+  <div class="script-card">
+    <h3>Название скрипта: Пример Скрипта</h3>
+    <p>Описание: Это пример скрипта для Аризона РП.</p>
+    <a href="example-script-file.zip" download>Скачать</a>
+    <p>Скачиваний: <span id="download-count">0</span></p>
+    <button class="delete-btn" onclick="deleteScript(this)">Удалить</button>
+  </div>
+</div>
+
+<img src="admin-icon.png" alt="Admin" class="admin-icon" onclick="showAdminMenu()">
+
+<div id="admin-menu">
+  <h3>Админ-панель</h3>
+  <input type="password" id="admin-password" placeholder="Введите пароль">
+  <button onclick="checkAdminPassword()">Войти</button>
+  <div id="admin-panel" style="display:none;">
+    <input type="text" id="script-name" placeholder="Название скрипта">
+    <textarea id="script-description" placeholder="Описание скрипта"></textarea>
+    <input type="file" id="script-file">
+    <button onclick="addScript()">Добавить скрипт</button>
+    <button class="close-btn" onclick="closeAdminMenu()">Закрыть меню</button>
+  </div>
+</div>
+
+<script>
+  let isAdmin = false; // Флаг для проверки, является ли пользователь администратором
+
+  // Показ меню администратора
+  function showAdminMenu() {
+    if (isAdmin) {
+      // Если пользователь уже вошёл как администратор
+      document.getElementById('admin-panel').style.display = 'block';
+      document.getElementById('admin-password').style.display = 'none'; // Убираем поле пароля
+    }
+    document.getElementById('admin-menu').style.display = 'block';
+  }
+
+  // Проверка пароля администратора
+  function checkAdminPassword() {
+    const password = document.getElementById('admin-password').value;
+    if (password === 'Admin123') { // Укажите ваш пароль администратора
+      isAdmin = true;
+      document.getElementById('admin-panel').style.display = 'block';
+      document.getElementById('admin-password').style.display = 'none'; // Убираем поле пароля
+      showDeleteButtons(); // Показываем кнопки "Удалить"
+    } else {
+      alert('Неверный пароль!');
+    }
+  }
+
+  // Закрытие меню администратора
+  function closeAdminMenu() {
+    document.getElementById('admin-menu').style.display = 'none';
+  }
+
+  // Добавление нового скрипта
+  function addScript() {
+    const name = document.getElementById('script-name').value;
+    const description = document.getElementById('script-description').value;
+    const fileInput = document.getElementById('script-file');
+    const file = fileInput.files[0];
+
+    if (name && description && file) {
+      const container = document.querySelector('.container');
+      const card = document.createElement('div');
+      card.classList.add('script-card');
+
+      const fileURL = URL.createObjectURL(file);
+
+      card.innerHTML = `
+        <h3>Название скрипта: ${name}</h3>
+        <p>Описание: ${description}</p>
+        <a href="${fileURL}" download="${file.name}">Скачать</a>
+        <p>Скачиваний: <span>0</span></p>
+        <button class="delete-btn" onclick="deleteScript(this)">Удалить</button>
+      `;
+      container.appendChild(card);
+      fileInput.value = ''; // Очистка поля загрузки файла
+
+      // Закрываем меню администратора после добавления
+      closeAdminMenu();
+      alert('Скрипт добавлен!');
+    } else {
+      alert('Заполните все поля!');
+    }
+  }
+
+  // Удаление скрипта
+  function deleteScript(button) {
+    const card = button.parentElement; // Находим родительский элемент кнопки (карточку)
+    card.remove(); // Удаляем карточку
+  }
+
+  // Показ кнопок "Удалить" только для администратора
+  function showDeleteButtons() {
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    deleteButtons.forEach(button => button.style.display = 'block');
+  }
+</script>
+
+</body>
+      </html>
