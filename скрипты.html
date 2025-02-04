@@ -41,7 +41,7 @@
       border-radius: 5px;
       padding: 5px 10px;
       cursor: pointer;
-      display: none; /* Скрываем кнопки по умолчанию */
+      display: none;
     }
     .admin-icon {
       position: fixed;
@@ -144,15 +144,19 @@
     const file = fileInput.files[0];
 
     if (name && description && file) {
-      const fileURL = URL.createObjectURL(file);
-      const newScript = { name, description, fileURL, fileName: file.name };
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const fileBase64 = event.target.result; // Получаем файл в Base64
+        const newScript = { name, description, fileBase64, fileName: file.name };
 
-      saveScript(newScript); // Сохранение в localStorage
-      renderScript(newScript); // Рендер нового скрипта на странице
+        saveScript(newScript); // Сохранение в localStorage
+        renderScript(newScript); // Рендер нового скрипта на странице
 
-      fileInput.value = ''; // Очистка поля загрузки файла
-      closeAdminMenu(); // Закрытие меню администратора
-      alert('Скрипт добавлен!');
+        fileInput.value = ''; // Очистка поля загрузки файла
+        closeAdminMenu(); // Закрытие меню администратора
+        alert('Скрипт добавлен!');
+      };
+      reader.readAsDataURL(file); // Преобразуем файл в Base64
     } else {
       alert('Заполните все поля!');
     }
@@ -167,7 +171,7 @@
     card.innerHTML = `
       <h3>Название скрипта: ${script.name}</h3>
       <p>Описание: ${script.description}</p>
-      <a href="${script.fileURL}" download="${script.fileName}">Скачать</a>
+      <a href="${script.fileBase64}" download="${script.fileName}">Скачать</a>
       <p>Скачиваний: <span>0</span></p>
       <button class="delete-btn" onclick="deleteScript(this)">Удалить</button>
     `;
