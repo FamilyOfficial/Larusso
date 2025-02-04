@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,6 +31,11 @@
     .script-card h3 {
       margin-top: 0;
     }
+    .script-card p {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      white-space: pre-wrap;
+    }
     .delete-btn {
       position: absolute;
       top: 10px;
@@ -43,12 +48,23 @@
       cursor: pointer;
       display: none;
     }
+    /* Значок администратора */
     .admin-icon {
       position: fixed;
       top: 20px;
       right: 20px;
+      width: 50px;
+      height: 50px;
+      background-color: red;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+      line-height: 50px;
+      border-radius: 50%;
       cursor: pointer;
     }
+    /* Меню администратора */
     #admin-menu {
       display: none;
       position: fixed;
@@ -60,10 +76,14 @@
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     }
-    #admin-menu input, #admin-menu textarea, #admin-menu button {
+    #admin-menu input, #admin-menu textarea, #admin-menu button, #admin-menu select {
       margin: 10px 0;
       padding: 10px;
       width: 100%;
+    }
+    #script-description {
+      height: 100px;
+      resize: vertical;
     }
     .close-btn {
       background-color: #555;
@@ -74,6 +94,29 @@
       cursor: pointer;
       margin-top: 10px;
     }
+    /* Вкладки */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      background-color: #333;
+      padding: 5px;
+      flex-wrap: wrap; /* Вкладки переносятся на новую строку, если не влезают */
+    }
+    .tab {
+      color: white;
+      padding: 6px 10px; /* Уменьшенные отступы */
+      cursor: pointer;
+      margin: 2px; /* Уменьшенный отступ между вкладками */
+      border-radius: 5px;
+      font-size: 14px; /* Меньший размер шрифта */
+      white-space: nowrap; /* Исключает перенос слов */
+    }
+    .tab:hover {
+      background-color: #444;
+    }
+    .tab.active {
+      background-color: #555;
+    }
   </style>
 </head>
 <body>
@@ -82,34 +125,50 @@
   <h1>Аризона РП Скрипты</h1>
 </header>
 
+<!-- Вкладки -->
+<div class="tabs" id="tabs">
+  <div class="tab active" onclick="filterScripts('Все')">Все</div>
+  <div class="tab" onclick="filterScripts('Хелперы')">Хелперы</div>
+  <div class="tab" onclick="filterScripts('Инструменты')">Инструменты</div>
+  <div class="tab" onclick="filterScripts('Графические')">Графические</div>
+  <div class="tab" onclick="filterScripts('Читы')">Читы</div>
+</div>
+
 <div class="container" id="script-container">
   <!-- Скрипты будут загружаться здесь -->
 </div>
 
-<img src="admin-icon.png" alt="Admin" class="admin-icon" onclick="showAdminMenu()">
+<!-- Значок администратора -->
+<div class="admin-icon" id="admin-icon" title="Админ" onclick="showAdminMenu()">A</div>
 
+<!-- Админ-меню -->
 <div id="admin-menu">
   <h3>Админ-панель</h3>
   <input type="password" id="admin-password" placeholder="Введите пароль">
   <button onclick="checkAdminPassword()">Войти</button>
+  <button class="close-btn" onclick="closeAdminMenu()">Закрыть меню</button>
   <div id="admin-panel" style="display:none;">
     <input type="text" id="script-name" placeholder="Название скрипта">
     <textarea id="script-description" placeholder="Описание скрипта"></textarea>
     <input type="file" id="script-file">
+    <select id="script-category">
+      <option value="Хелперы">Хелперы</option>
+      <option value="Инструменты">Инструменты</option>
+      <option value="Графические">Графические</option>
+      <option value="Читы">Читы</option>
+    </select>
     <button onclick="addScript()">Добавить скрипт</button>
-    <button class="close-btn" onclick="closeAdminMenu()">Закрыть меню</button>
   </div>
 </div>
 
 <script>
-  let isAdmin = false; // Флаг для проверки, является ли пользователь администратором
+  let isAdmin = false;
+  let currentCategory = 'Все';
 
-  // Загрузка сохранённых скриптов из localStorage
   window.onload = function() {
     loadScripts();
   };
 
-  // Показ меню администратора
   function showAdminMenu() {
     if (isAdmin) {
       document.getElementById('admin-panel').style.display = 'block';
@@ -118,103 +177,146 @@
     document.getElementById('admin-menu').style.display = 'block';
   }
 
-  // Проверка пароля администратора
   function checkAdminPassword() {
     const password = document.getElementById('admin-password').value;
     if (password === 'Admin123') {
       isAdmin = true;
       document.getElementById('admin-panel').style.display = 'block';
       document.getElementById('admin-password').style.display = 'none';
-      showDeleteButtons(); // Показываем кнопки "Удалить"
+      showDeleteButtons();
     } else {
       alert('Неверный пароль!');
     }
   }
 
-  // Закрытие меню администратора
   function closeAdminMenu() {
     document.getElementById('admin-menu').style.display = 'none';
   }
 
-  // Добавление нового скрипта
-  function addScript() {
+  async function addScript() {
     const name = document.getElementById('script-name').value;
     const description = document.getElementById('script-description').value;
     const fileInput = document.getElementById('script-file');
     const file = fileInput.files[0];
+    const category = document.getElementById('script-category').value;
 
     if (name && description && file) {
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        const fileBase64 = event.target.result; // Получаем файл в Base64
-        const newScript = { name, description, fileBase64, fileName: file.name };
-
-        saveScript(newScript); // Сохранение в localStorage
-        renderScript(newScript); // Рендер нового скрипта на странице
-
-        fileInput.value = ''; // Очистка поля загрузки файла
-        closeAdminMenu(); // Закрытие меню администратора
+      try {
+        const base64File = await fileToBase64(file);
+        const newScript = { 
+          name, 
+          description, 
+          fileBase64: base64File, 
+          fileName: file.name, 
+          category,
+          downloads: 0
+        };
+        saveScript(newScript);
+        renderScript(newScript);
+        fileInput.value = '';
+        closeAdminMenu();
         alert('Скрипт добавлен!');
-      };
-      reader.readAsDataURL(file); // Преобразуем файл в Base64
+      } catch (error) {
+        alert('Ошибка загрузки файла!');
+      }
     } else {
       alert('Заполните все поля!');
     }
   }
 
-  // Рендер скрипта на странице
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
+  }
+
   function renderScript(script) {
     const container = document.getElementById('script-container');
     const card = document.createElement('div');
     card.classList.add('script-card');
+    card.dataset.category = script.category;
 
     card.innerHTML = `
-      <h3>Название скрипта: ${script.name}</h3>
-      <p>Описание: ${script.description}</p>
-      <a href="${script.fileBase64}" download="${script.fileName}">Скачать</a>
-      <p>Скачиваний: <span>0</span></p>
+      <h3>${script.name}</h3>
+      <p>${script.description}</p>
+      <a href="${script.fileBase64}" download="${script.fileName}" onclick="increaseDownloadCount('${script.name}')">
+        Скачать
+      </a> <span>(${script.fileName.split('.').pop()})</span>
+      <p>Скачиваний: <span id="download-count-${script.name}">${script.downloads}</span></p>
       <button class="delete-btn" onclick="deleteScript(this)">Удалить</button>
     `;
 
     container.appendChild(card);
     if (isAdmin) {
-      showDeleteButtons(); // Показываем кнопки "Удалить", если администратор вошёл
+      showDeleteButtons();
     }
   }
 
-  // Сохранение скрипта в localStorage
   function saveScript(script) {
     const scripts = JSON.parse(localStorage.getItem('scripts')) || [];
     scripts.push(script);
     localStorage.setItem('scripts', JSON.stringify(scripts));
   }
 
-  // Загрузка скриптов из localStorage
   function loadScripts() {
     const scripts = JSON.parse(localStorage.getItem('scripts')) || [];
     scripts.forEach(script => renderScript(script));
   }
 
-  // Удаление скрипта
-  function deleteScript(button) {
-    const card = button.parentElement; // Находим родительский элемент кнопки (карточку)
-    const scriptName = card.querySelector('h3').textContent.replace('Название скрипта: ', '');
+  function filterScripts(category) {
+    currentCategory = category;
+    const allScripts = document.querySelectorAll('.script-card');
+    allScripts.forEach(script => {
+      if (category === 'Все' || script.dataset.category === category) {
+        script.style.display = 'block';
+      } else {
+        script.style.display = 'none';
+      }
+    });
 
-    card.remove(); // Удаляем карточку со страницы
-    removeScriptFromStorage(scriptName); // Удаляем скрипт из localStorage
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(tab => {
+      tab.classList.remove('active');
+    });
+    const activeTab = document.querySelector(`.tab[onclick="filterScripts('${category}')"]`);
+    activeTab.classList.add('active');
   }
 
-  // Удаление скрипта из localStorage
+  function increaseDownloadCount(name) {
+    let scripts = JSON.parse(localStorage.getItem('scripts')) || [];
+    let downloadedFiles = JSON.parse(localStorage.getItem('downloadedFiles')) || [];
+
+    if (!downloadedFiles.includes(name)) {
+      const scriptIndex = scripts.findIndex(script => script.name === name);
+      if (scriptIndex !== -1) {
+        scripts[scriptIndex].downloads += 1;
+        localStorage.setItem('scripts', JSON.stringify(scripts));
+        document.getElementById(`download-count-${name}`).innerText = scripts[scriptIndex].downloads;
+        downloadedFiles.push(name);
+        localStorage.setItem('downloadedFiles', JSON.stringify(downloadedFiles));
+      }
+    }
+  }
+
+  function showDeleteButtons() {
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    deleteButtons.forEach(button => button.style.display = 'block');
+  }
+
+  function deleteScript(button) {
+    const card = button.parentElement;
+    const scriptName = card.querySelector('h3').textContent;
+    card.remove();
+    removeScriptFromStorage(scriptName);
+  }
+
   function removeScriptFromStorage(name) {
     const scripts = JSON.parse(localStorage.getItem('scripts')) || [];
     const updatedScripts = scripts.filter(script => script.name !== name);
     localStorage.setItem('scripts', JSON.stringify(updatedScripts));
-  }
-
-  // Показ кнопок "Удалить" только для администратора
-  function showDeleteButtons() {
-    const deleteButtons = document.querySelectorAll('.delete-btn');
-    deleteButtons.forEach(button => button.style.display = 'block');
   }
 </script>
 
