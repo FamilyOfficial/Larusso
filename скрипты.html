@@ -100,16 +100,16 @@
       justify-content: center;
       background-color: #333;
       padding: 5px;
-      flex-wrap: wrap; /* Вкладки переносятся на новую строку, если не влезают */
+      flex-wrap: wrap;
     }
     .tab {
       color: white;
-      padding: 6px 10px; /* Уменьшенные отступы */
+      padding: 6px 10px;
       cursor: pointer;
-      margin: 2px; /* Уменьшенный отступ между вкладками */
+      margin: 2px;
       border-radius: 5px;
-      font-size: 14px; /* Меньший размер шрифта */
-      white-space: nowrap; /* Исключает перенос слов */
+      font-size: 14px;
+      white-space: nowrap;
     }
     .tab:hover {
       background-color: #444;
@@ -162,6 +162,11 @@
 </div>
 
 <script>
+  const GITHUB_API_TOKEN = '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';  // Замените на ваш токен
+  const REPO_OWNER = 'Zeka12394';  // Замените на ваш GitHub логин
+  const REPO_NAME = 'Testj';  // Замените на имя вашего репозитория
+  const FILE_PATH = 'scripts.json';  // Имя файла, который вы создали
+
   let isAdmin = false;
   let currentCategory = 'Все';
 
@@ -196,23 +201,62 @@
   function addScript() {
     const name = document.getElementById('script-name').value;
     const description = document.getElementById('script-description').value;
-    const driveLink = document.getElementById('google-drive-link').value; // Ссылка на файл
+    const driveLink = document.getElementById('google-drive-link').value;
     const category = document.getElementById('script-category').value;
 
     if (name && description && driveLink) {
-      const newScript = { 
+      const newScript = {
         name, 
         description, 
-        fileLink: driveLink, // Сохраняем ссылку на файл
+        fileLink: driveLink, 
         category,
         downloads: 0
       };
+
       saveScript(newScript);
       renderScript(newScript);
       clearAdminPanel();
       alert('Скрипт добавлен!');
     } else {
       alert('Заполните все поля!');
+    }
+  }
+
+  async function saveScript(script) {
+    const response = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`, {
+      headers: { Authorization: `token ${GITHUB_API_TOKEN}` }
+    });
+
+    if (!response.ok) {
+      alert('Не удалось загрузить текущие данные!');
+      return;
+    }
+
+    const data = await response.json();
+    const currentScripts = JSON.parse(atob(data.content));
+    const sha = data.sha;
+
+    currentScripts.push(script);
+
+    const updatedContent = btoa(JSON.stringify(currentScripts, null, 2));
+
+    const updateResponse = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `token ${GITHUB_API_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: 'Добавлен новый скрипт',
+        content: updatedContent,
+        sha: sha
+      })
+    });
+
+    if (updateResponse.ok) {
+      alert('Скрипт успешно сохранен!');
+    } else {
+      console.error('Ошибка сохранения:', await updateResponse.json());
     }
   }
 
@@ -233,15 +277,17 @@
     container.appendChild(card);
   }
 
-  function saveScript(script) {
-    const scripts = JSON.parse(localStorage.getItem('scripts')) || [];
-    scripts.push(script);
-    localStorage.setItem('scripts', JSON.stringify(scripts));
-  }
-
   function loadScripts() {
-    const scripts = JSON.parse(localStorage.getItem('scripts')) || [];
-    scripts.forEach(script => renderScript(script));
+    const response = fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`, {
+      headers: { Authorization: `token ${GITHUB_API_TOKEN}` }
+    });
+
+    response.then(res => res.json()).then(data => {
+      const content = atob(data.content);
+      const scripts = JSON.parse(content);
+
+      scripts.forEach(script => renderScript(script));
+    });
   }
 
   function filterScripts(category) {
@@ -276,15 +322,35 @@
   }
 
   function removeScriptFromStorage(name) {
-    const scripts = JSON.parse(localStorage.getItem('scripts')) || [];
-    const updatedScripts = scripts.filter(script => script.name !== name);
-    localStorage.setItem('scripts', JSON.stringify(updatedScripts));
-  }
+    const response = fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`, {
+      headers: { Authorization: `token ${GITHUB_API_TOKEN}` }
+    });
 
-  function clearAdminPanel() {
-    document.getElementById('script-name').value = '';
-    document.getElementById('script-description').value = '';
-    document.getElementById('google-drive-link').value = '';
+    response.then(res => res.json()).then(data => {
+      const currentScripts = JSON.parse(atob(data.content));
+      const updatedScripts = currentScripts.filter(script => script.name !== name);
+
+      const updatedContent = btoa(JSON.stringify(updatedScripts, null, 2));
+
+      fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `token ${GITHUB_API_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: 'Удален скрипт',
+          content: updatedContent,
+          sha: data.sha
+        })
+      }).then(updateResponse => {
+        if (updateResponse.ok) {
+          alert('Скрипт удален!');
+        } else {
+          console.error('Ошибка при удалении скрипта:', updateResponse);
+        }
+      });
+    });
   }
 </script>
 
