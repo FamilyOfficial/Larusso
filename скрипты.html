@@ -150,7 +150,7 @@
   <div id="admin-panel" style="display:none;">
     <input type="text" id="script-name" placeholder="Название скрипта">
     <textarea id="script-description" placeholder="Описание скрипта"></textarea>
-    <input type="file" id="script-file">
+    <input type="text" id="google-drive-link" placeholder="Ссылка на файл в Google Drive">
     <select id="script-category">
       <option value="Хелперы">Хелперы</option>
       <option value="Инструменты">Инструменты</option>
@@ -193,44 +193,27 @@
     document.getElementById('admin-menu').style.display = 'none';
   }
 
-  async function addScript() {
+  function addScript() {
     const name = document.getElementById('script-name').value;
     const description = document.getElementById('script-description').value;
-    const fileInput = document.getElementById('script-file');
-    const file = fileInput.files[0];
+    const driveLink = document.getElementById('google-drive-link').value; // Ссылка на файл
     const category = document.getElementById('script-category').value;
 
-    if (name && description && file) {
-      try {
-        const base64File = await fileToBase64(file);
-        const newScript = { 
-          name, 
-          description, 
-          fileBase64: base64File, 
-          fileName: file.name, 
-          category,
-          downloads: 0
-        };
-        saveScript(newScript);
-        renderScript(newScript);
-        fileInput.value = '';
-        closeAdminMenu();
-        alert('Скрипт добавлен!');
-      } catch (error) {
-        alert('Ошибка загрузки файла!');
-      }
+    if (name && description && driveLink) {
+      const newScript = { 
+        name, 
+        description, 
+        fileLink: driveLink, // Сохраняем ссылку на файл
+        category,
+        downloads: 0
+      };
+      saveScript(newScript);
+      renderScript(newScript);
+      clearAdminPanel();
+      alert('Скрипт добавлен!');
     } else {
       alert('Заполните все поля!');
     }
-  }
-
-  function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = error => reject(error);
-    });
   }
 
   function renderScript(script) {
@@ -242,17 +225,12 @@
     card.innerHTML = `
       <h3>${script.name}</h3>
       <p>${script.description}</p>
-      <a href="${script.fileBase64}" download="${script.fileName}" onclick="increaseDownloadCount('${script.name}')">
-        Скачать
-      </a> <span>(${script.fileName.split('.').pop()})</span>
+      <a href="${script.fileLink}" target="_blank">Скачать</a>
       <p>Скачиваний: <span id="download-count-${script.name}">${script.downloads}</span></p>
       <button class="delete-btn" onclick="deleteScript(this)">Удалить</button>
     `;
 
     container.appendChild(card);
-    if (isAdmin) {
-      showDeleteButtons();
-    }
   }
 
   function saveScript(script) {
@@ -285,22 +263,6 @@
     activeTab.classList.add('active');
   }
 
-  function increaseDownloadCount(name) {
-    let scripts = JSON.parse(localStorage.getItem('scripts')) || [];
-    let downloadedFiles = JSON.parse(localStorage.getItem('downloadedFiles')) || [];
-
-    if (!downloadedFiles.includes(name)) {
-      const scriptIndex = scripts.findIndex(script => script.name === name);
-      if (scriptIndex !== -1) {
-        scripts[scriptIndex].downloads += 1;
-        localStorage.setItem('scripts', JSON.stringify(scripts));
-        document.getElementById(`download-count-${name}`).innerText = scripts[scriptIndex].downloads;
-        downloadedFiles.push(name);
-        localStorage.setItem('downloadedFiles', JSON.stringify(downloadedFiles));
-      }
-    }
-  }
-
   function showDeleteButtons() {
     const deleteButtons = document.querySelectorAll('.delete-btn');
     deleteButtons.forEach(button => button.style.display = 'block');
@@ -317,6 +279,12 @@
     const scripts = JSON.parse(localStorage.getItem('scripts')) || [];
     const updatedScripts = scripts.filter(script => script.name !== name);
     localStorage.setItem('scripts', JSON.stringify(updatedScripts));
+  }
+
+  function clearAdminPanel() {
+    document.getElementById('script-name').value = '';
+    document.getElementById('script-description').value = '';
+    document.getElementById('google-drive-link').value = '';
   }
 </script>
 
