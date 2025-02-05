@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "name": "Пример скрипта",
+    "description": "Описание для тестового скрипта.",
+    "fileLink": "https://example.com/test-script.lua",
+    "category": "Хелперы",
+    "downloads": 0
+  }
+]
