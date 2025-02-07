@@ -57,31 +57,26 @@
 
     <div class="form-container">
         <form action="https://formspree.io/f/xpwwobgr" method="POST" enctype="multipart/form-data">
-            <!-- Поле для email -->
             <label>
                 Ваш email:
                 <input type="email" name="email" required>
             </label>
             
-            <!-- Поле для игрового ника -->
             <label>
                 Ваш игровой ник:
                 <input type="text" name="nickname" required>
             </label>
 
-            <!-- Поле для количества монет -->
             <label>
                 Сколько вы положили семейных монет:
                 <input type="number" name="coins" required>
             </label>
 
-            <!-- Поле для загрузки файла -->
             <label>
                 Ваш файл (доказательство):
                 <input type="file" name="upload" required>
             </label>
 
-            <!-- Кнопка отправки -->
             <button type="submit">Отправить</button>
         </form>
         
@@ -89,7 +84,6 @@
     </div>
 
     <script>
-        // Обработчик успешной отправки
         document.querySelector("form").addEventListener("submit", function(event) {
             event.preventDefault();
             let formData = new FormData(this);
