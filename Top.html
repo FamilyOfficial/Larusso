@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Заявка на премию</title>
+    <title>Заявка на премию семейных монет</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -56,17 +56,41 @@
     <h2>Добро пожаловать в заявление на подачу премии семейных монет</h2>
 
     <div class="form-container">
-        <form id="awardForm" action"https://formspree.io/f/xpwwobgr" method="POST" enctype="multipart/form-data">
-            <input type="text" name="nickname" placeholder="Ваш игровой ник" required>
-            <input type="number" name="coins" placeholder="Сколько вы положили семейных монет" required>
-            <input type="file" name="proof" required>
+        <form action="https://formspree.io/f/xpwwobgr" method="POST" enctype="multipart/form-data">
+            <!-- Поле для email -->
+            <label>
+                Ваш email:
+                <input type="email" name="email" required>
+            </label>
+            
+            <!-- Поле для игрового ника -->
+            <label>
+                Ваш игровой ник:
+                <input type="text" name="nickname" required>
+            </label>
+
+            <!-- Поле для количества монет -->
+            <label>
+                Сколько вы положили семейных монет:
+                <input type="number" name="coins" required>
+            </label>
+
+            <!-- Поле для загрузки файла -->
+            <label>
+                Ваш файл (доказательство):
+                <input type="file" name="upload" required>
+            </label>
+
+            <!-- Кнопка отправки -->
             <button type="submit">Отправить</button>
         </form>
+        
         <div class="success-message" id="successMessage">✅ Ваша заявка успешно отправлена!</div>
     </div>
 
     <script>
-        document.getElementById("awardForm").addEventListener("submit", function(event) {
+        // Обработчик успешной отправки
+        document.querySelector("form").addEventListener("submit", function(event) {
             event.preventDefault();
             let formData = new FormData(this);
 
