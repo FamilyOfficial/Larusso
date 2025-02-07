@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заявка на премию</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #222;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .form-container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            background: #333;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+        }
+        input[type="file"] {
+            background: #444;
+            color: white;
+        }
+        button {
+            background: #ffcc00;
+            color: black;
+            font-size: 16px;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background: #ffaa00;
+        }
+        .success-message {
+            display: none;
+            color: lightgreen;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Добро пожаловать в заявление на подачу премии семейных монет</h2>
+
+    <div class="form-container">
+        <form id="awardForm" action"https://formspree.io/f/xpwwobgr" method="POST" enctype="multipart/form-data">
+            <input type="text" name="nickname" placeholder="Ваш игровой ник" required>
+            <input type="number" name="coins" placeholder="Сколько вы положили семейных монет" required>
+            <input type="file" name="proof" required>
+            <button type="submit">Отправить</button>
+        </form>
+        <div class="success-message" id="successMessage">✅ Ваша заявка успешно отправлена!</div>
+    </div>
+
+    <script>
+        document.getElementById("awardForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            let formData = new FormData(this);
+
+            fetch(this.action, {
+                method: "POST",
+                body: formData,
+                headers: { "Accept": "application/json" }
+            }).then(response => {
+                if (response.ok) {
+                    document.getElementById("successMessage").style.display = "block";
+                    this.reset();
+                } else {
+                    alert("Ошибка отправки, попробуйте позже.");
+                }
+            }).catch(error => {
+                alert("Ошибка соединения.");
+            });
+        });
+    </script>
+
+</body>
+</html>
