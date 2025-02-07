@@ -277,15 +277,31 @@ const FILE_PATH = 'scripts.json';  // путь к файлу
   }
 
   function loadScripts() {
-    const response = fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`, {
-      headers: { Authorization: `token ${GITHUB_API_TOKEN}` }
-    });
+    alert("Началась загрузка скриптов!"); // Проверяем, вызывается ли функция
 
-    response.then(res => res.json()).then(data => {
+    fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`, {
+      headers: { Authorization: `token ${GITHUB_API_TOKEN}` }
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Ошибка загрузки: ${response.status} ${response.statusText}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (!data.content) {
+        throw new Error("Файл scripts.json пуст или не содержит данных.");
+      }
+
       const content = atob(data.content);
       const scripts = JSON.parse(content);
 
       scripts.forEach(script => renderScript(script));
+
+      alert("Скрипты успешно загружены!"); // Проверяем, дошёл ли код до конца
+    })
+    .catch(error => {
+      alert("Ошибка загрузки скриптов: " + error.message);
     });
   }
 
