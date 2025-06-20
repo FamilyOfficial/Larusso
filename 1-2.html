@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LARUSSO Тест</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Rubik', sans-serif;
+      background: linear-gradient(to right, #1f2937, #111827);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .card {
+      background-color: #1c1f26;
+      padding: 40px;
+      max-width: 750px;
+      width: 95%;
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+      position: relative;
+    }
+
+    .logo {
+      display: block;
+      margin: 0 auto 25px;
+      max-width: 160px;
+      border-radius: 50%;
+      border: 3px solid #10b981;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 30px;
+      color: #10b981;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin: 20px 0 10px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #4b5563;
+      background-color: #111827;
+      color: #e5e7eb;
+      font-size: 15px;
+    }
+
+    input::placeholder {
+      color: #9ca3af;
+    }
+
+    .error {
+      color: #f87171;
+      font-size: 13px;
+      margin-top: 5px;
+    }
+
+    button[type="submit"] {
+      margin-top: 30px;
+      width: 100%;
+      padding: 14px;
+      background-color: #10b981;
+      color: #fff;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #0f9f77;
+    }
+
+    .result {
+      margin-top: 25px;
+      padding: 20px;
+      background-color: #065f46;
+      border-radius: 12px;
+      text-align: center;
+      font-size: 18px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      display: none;
+    }
+
+    .result.show {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .result strong {
+      font-size: 20px;
+      color: #fff;
+    }
+
+    .retry-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #ef4444;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      display: none;
+    }
+
+    .music-toggle {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background-color: #10b981;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      z-index: 9999;
+      box-shadow: 0 4px 8px rgba(16, 185, 129, 0.4);
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .music-toggle:hover {
+      background-color: #0f9f77;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <img src="logo.png" alt="LARUSSO Logo" class="logo" />
+    <h1>Тест на повышение<br>с 1 на 2 ранг<br>LARUSSO Family</h1>
+
+    <form id="quizForm">
+      <label for="name">Ваш ник:</label>
+      <input type="text" id="name" placeholder="Например: Family_Larusso" required />
+      <div class="error" id="errorMessageName"></div>
+
+      <label>1. Можно ли употреблять наркотики членам семьи, не состоящим в КС, на кумите или МП?</label>
+      <select id="q1" required>
+        <option value="">Выберите ответ</option>
+        <option value="нельзя">Нельзя — это строго запрещено правилами семьи.</option>
+        <option value="если_никто">Можно, если никто не видит.</option>
+        <option value="на_мп">Можно только на МП.</option>
+        <option value="всем_можно">Разрешено всем, у кого есть доступ.</option>
+      </select>
+      <div class="error" id="errorMessageQ1"></div>
+
+      <label>2. Кто отвечает за защиту прав членов семьи?</label>
+      <select id="q2" required>
+        <option value="">Выберите ответ</option>
+        <option value="глава">Глава семьи — он гарант прав и порядка.</option>
+        <option value="сам">Члены семьи сами за себя отвечают.</option>
+        <option value="адвокат">Специальный адвокат.</option>
+        <option value="никто">Никто — у нас свободная семья.</option>
+      </select>
+      <div class="error" id="errorMessageQ2"></div>
+
+      <label>3. В какое время можно арендовать транспорт у главы?</label>
+      <select id="q3" required>
+        <option value="">Выберите ответ</option>
+        <option value="17">В 17:00 по МСК — строго по правилам.</option>
+        <option value="в_любое">В любое удобное для игрока время.</option>
+        <option value="утро">С 9:00 до 12:00.</option>
+        <option value="ночь">После 22:00, когда глава не занят.</option>
+      </select>
+      <div class="error" id="errorMessageQ3"></div>
+
+      <label>4. Должен ли каждый с честью носить имя Ларуссо?</label>
+      <select id="q4" required>
+        <option value="">Выберите ответ</option>
+        <option value="да">Да — это обязательное условие членства в семье.</option>
+        <option value="по_желанию">Нет, это по желанию.</option>
+        <option value="только_лидеры">Только лидеры обязаны.</option>
+        <option value="можно_скрывать">Можно скрывать принадлежность к семье.</option>
+      </select>
+      <div class="error" id="errorMessageQ4"></div>
+
+      <label>5. Что должен делать каждый член семьи?</label>
+      <select id="q5" required>
+        <option value="">Выберите ответ</option>
+        <option value="вносить">Вносить вклад в развитие семьи и её авторитет.</option>
+        <option value="ничего">Ничего, главное просто быть в семье.</option>
+        <option value="только_свои">Заниматься только своими делами.</option>
+        <option value="только_главе">Подчиняться только главе и не думать о развитии.</option>
+      </select>
+      <div class="error" id="errorMessageQ5"></div>
+
+      <button type="submit">Проверить</button>
+    </form>
+
+    <div class="result" id="resultBox">
+      <button class="retry-btn" id="retryBtn">Начать заново</button>
+    </div>
+  </div>
+
+  <audio id="bgMusic" loop>
+    <source src="cala_bonita.m4a" type="audio/mp4" />
+    Ваш браузер не поддерживает аудио.
+  </audio>
+
+  <button class="music-toggle" id="musicToggleBtn" onclick="toggleMusic()">
+    <span id="musicIcon">🔇</span> <span id="musicText">Вкл</span>
+  </button>
+
+  <script>
+    const music = document.getElementById('bgMusic');
+    const btn = document.getElementById('musicToggleBtn');
+    const icon = document.getElementById('musicIcon');
+    const text = document.getElementById('musicText');
+    let isPlaying = false;
+
+    function toggleMusic() {
+      if (isPlaying) {
+        music.pause();
+        icon.textContent = '🔇';
+        text.textContent = 'Вкл';
+      } else {
+        music.play();
+        icon.textContent = '🔊';
+        text.textContent = 'Выкл';
+      }
+      isPlaying = !isPlaying;
+    }
+
+    function shuffleOptions(selectId) {
+      const select = document.getElementById(selectId);
+      const options = Array.from(select.options).slice(1); // исключаем плейсхолдер
+      const shuffled = options.sort(() => Math.random() - 0.5);
+      select.innerHTML = '';
+      const placeholder = document.createElement('option');
+      placeholder.value = '';
+      placeholder.textContent = 'Выберите ответ';
+      select.appendChild(placeholder);
+      shuffled.forEach(option => select.appendChild(option));
+    }
+
+    window.onload = function() {
+      shuffleOptions('q1');
+      shuffleOptions('q2');
+      shuffleOptions('q3');
+      shuffleOptions('q4');
+      shuffleOptions('q5');
+    };
+
+    document.getElementById('quizForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const q1 = document.getElementById('q1').value;
+      const q2 = document.getElementById('q2').value;
+      const q3 = document.getElementById('q3').value;
+      const q4 = document.getElementById('q4').value;
+      const q5 = document.getElementById('q5').value;
+
+      let error = false;
+
+      function showError(id, condition, msg) {
+        const el = document.getElementById(id);
+        el.textContent = condition ? msg : "";
+        if (condition) error = true;
+      }
+
+      showError('errorMessageName', !name, 'Введите ник');
+      showError('errorMessageQ1', !q1, 'Выберите ответ');
+      showError('errorMessageQ2', !q2, 'Выберите ответ');
+      showError('errorMessageQ3', !q3, 'Выберите ответ');
+      showError('errorMessageQ4', !q4, 'Выберите ответ');
+      showError('errorMessageQ5', !q5, 'Выберите ответ');
+
+      if (error) return;
+
+      const correctAnswers = {
+        q1: 'нельзя',
+        q2: 'глава',
+        q3: '17',
+        q4: 'да',
+        q5: 'вносить'
+      };
+
+      let score = 0;
+      if (q1 === correctAnswers.q1) score++;
+      if (q2 === correctAnswers.q2) score++;
+      if (q3 === correctAnswers.q3) score++;
+      if (q4 === correctAnswers.q4) score++;
+      if (q5 === correctAnswers.q5) score++;
+
+      const resultBox = document.getElementById('resultBox');
+      const retryBtn = document.getElementById('retryBtn');
+
+      let resultHTML = `
+        <strong>${name}</strong><br>
+        Ваш результат: ${score} из 5<br><br>
+      `;
+
+      if (score === 5) {
+        resultHTML += "🎉 Отлично! Вы готовы к повышению.<br><br>📸 <em>Сделай скрин для отчёта</em>";
+      } else {
+        resultHTML += "🔁 Недостаточно. Попробуйте ещё раз.";
+      }
+
+      resultBox.innerHTML = resultHTML;
+      resultBox.appendChild(retryBtn);
+      resultBox.classList.add('show');
+
+      document.getElementById('quizForm').style.display = 'none';
+
+      if (score < 5) {
+        retryBtn.style.display = 'inline-block';
+        retryBtn.onclick = function () {
+          document.getElementById('quizForm').reset();
+          document.getElementById('quizForm').style.display = 'block';
+          resultBox.style.display = 'none';
+          retryBtn.style.display = 'none';
+          resultBox.classList.remove('show');
+          ['errorMessageName', 'errorMessageQ1', 'errorMessageQ2', 'errorMessageQ3', 'errorMessageQ4', 'errorMessageQ5']
+            .forEach(id => document.getElementById(id).textContent = '');
+          shuffleOptions('q1');
+          shuffleOptions('q2');
+          shuffleOptions('q3');
+          shuffleOptions('q4');
+          shuffleOptions('q5');
+        };
+      } else {
+        retryBtn.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
