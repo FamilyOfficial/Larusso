@@ -312,31 +312,49 @@
       const resultBox = document.getElementById('resultBox');
       const retryBtn = document.getElementById('retryBtn');
 
-      let resultHTML = `
+      // Формируем текст результата в отдельном элементе, не трогаем кнопку
+      let resultText = `
         <strong>${name}</strong><br>
         Ваш результат: ${score} из 5<br><br>
       `;
 
       if (score === 5) {
-        resultHTML += "🎉 Отлично! Вы готовы к повышению.<br><br>📸 <em>Сделай скрин для отчёта</em>";
+        resultText += "🎉 Отлично! Вы готовы к повышению.<br><br>📸 <em>Сделай скрин для отчёта</em>";
       } else {
-        resultHTML += "🔁 Недостаточно. Попробуйте ещё раз.";
+        resultText += "🔁 Недостаточно. Попробуйте ещё раз.";
       }
 
-      resultBox.innerHTML = resultHTML;
+      // Вставляем текст результата в resultBox, но не кнопку
+      resultBox.innerHTML = '';
+      const textNode = document.createElement('div');
+      textNode.innerHTML = resultText;
+      resultBox.appendChild(textNode);
       resultBox.appendChild(retryBtn);
-      resultBox.classList.add('show');
 
       document.getElementById('quizForm').style.display = 'none';
+
+      // Скрываем кнопку пока, покажем ниже при необходимости
+      retryBtn.style.display = 'none';
+
+      // Сбрасываем класс анимации и показываем с задержкой для запуска анимации
+      resultBox.classList.remove('show');
+      resultBox.style.display = 'block';
+      setTimeout(() => {
+        resultBox.classList.add('show');
+      }, 10); // чуть задержки для рендера
 
       if (score < 5) {
         retryBtn.style.display = 'inline-block';
         retryBtn.onclick = function () {
           document.getElementById('quizForm').reset();
           document.getElementById('quizForm').style.display = 'block';
-          resultBox.style.display = 'none';
-          retryBtn.style.display = 'none';
+          // Скрываем результат с анимацией
           resultBox.classList.remove('show');
+          setTimeout(() => {
+            resultBox.style.display = 'none';
+            retryBtn.style.display = 'none';
+          }, 500); // совпадает с временем transition
+
           ['errorMessageName', 'errorMessageQ1', 'errorMessageQ2', 'errorMessageQ3', 'errorMessageQ4', 'errorMessageQ5']
             .forEach(id => document.getElementById(id).textContent = '');
           shuffleOptions('q1');
@@ -351,4 +369,4 @@
     });
   </script>
 </body>
-</html>
+  </html>
