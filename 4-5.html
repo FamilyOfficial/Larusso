@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Тест для повышения с 4 до 5 ранга — LARUSSO</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Rubik', sans-serif;
+      background: linear-gradient(to right, #1f2937, #111827);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .card {
+      background-color: #1c1f26;
+      padding: 40px;
+      max-width: 750px;
+      width: 100%;
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.4);
+      position: relative;
+    }
+    .logo {
+      display: block;
+      margin: 0 auto 25px;
+      max-width: 160px;
+      border-radius: 50%;
+      border: 3px solid #10b981;
+    }
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 30px;
+      color: #10b981;
+      line-height: 1.3;
+    }
+    .question-label {
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: block;
+      font-size: 16px;
+    }
+    .radio-group {
+      margin-bottom: 25px;
+    }
+    .radio-label {
+      display: block;
+      background-color: #111827;
+      padding: 14px 20px;
+      border-radius: 12px;
+      border: 2px solid #4b5563;
+      cursor: pointer;
+      margin-bottom: 10px;
+      color: #e5e7eb;
+      transition: 0.3s;
+      position: relative;
+    }
+    .radio-label:hover {
+      border-color: #10b981;
+      background-color: #172022;
+    }
+    .radio-label input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 100%;
+      width: 100%;
+      top: 0;
+      left: 0;
+      margin: 0;
+    }
+    .radio-label input:checked + span {
+      background-color: #10b981;
+      color: white;
+      border-radius: 10px;
+      padding: 6px 12px;
+      font-weight: 600;
+      display: inline-block;
+    }
+    .error {
+      color: #f87171;
+      font-size: 13px;
+      margin-top: -5px;
+      margin-bottom: 15px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 15px;
+      border-radius: 10px;
+      border: 1px solid #4b5563;
+      background-color: #111827;
+      color: #e5e7eb;
+      margin-bottom: 20px;
+    }
+    button[type="submit"] {
+      width: 100%;
+      padding: 14px;
+      background-color: #10b981;
+      color: #fff;
+      font-size: 16px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button[type="submit"]:hover {
+      background-color: #0f9a6e;
+    }
+    .result {
+      margin-top: 25px;
+      padding: 20px;
+      background-color: #065f46;
+      border-radius: 15px;
+      text-align: center;
+      font-size: 18px;
+      display: none;
+      color: #e0ffe0;
+    }
+    .retry-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #ef4444;
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      display: none;
+      transition: background-color 0.3s ease;
+    }
+    .retry-btn:hover {
+      background-color: #dc2626;
+    }
+    label[for="musicSelect"] {
+      margin-top: 20px;
+      display: block;
+      font-weight: 600;
+      color: #10b981;
+      margin-bottom: 8px;
+    }
+    select#musicSelect {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #4b5563;
+      background-color: #111827;
+      color: #e5e7eb;
+      font-size: 15px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-image: url('data:image/svg+xml;utf8,<svg fill="%23e5e7eb" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px 16px;
+    }
+    .music-toggle {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background-color: #10b981;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <img src="logo.png" alt="LARUSSO Logo" class="logo" />
+    <h1>Тест на повышение с 4 до 5 ранга<br>LARUSSO Family</h1>
+
+    <form id="quizForm">
+      <label for="name">Введите ваш ник:</label>
+      <input type="text" id="name" placeholder="Например: Family_Larusso" />
+      <div class="error" id="errorName"></div>
+
+      <div>
+        <label class="question-label">1. Где проводится турнир Кумите?</label>
+        <div class="radio-group" id="q1">
+          <label class="radio-label"><input type="radio" name="q1" value="На центральном рынке"><span>На центральном рынке</span></label>
+          <label class="radio-label"><input type="radio" name="q1" value="В спортзале г.Лас Вентурас"><span>В спортзале г.Лас Вентурас</span></label>
+          <label class="radio-label"><input type="radio" name="q1" value="В парке"><span>В парке</span></label>
+          <label class="radio-label"><input type="radio" name="q1" value="На стадионе"><span>На стадионе</span></label>
+          <label class="radio-label"><input type="radio" name="q1" value="В школе"><span>В школе</span></label>
+        </div>
+        <div class="error" id="errorQ1"></div>
+      </div>
+
+      <div>
+        <label class="question-label">2. Кто допускается к участию в Кумите?</label>
+        <div class="radio-group" id="q2">
+          <label class="radio-label"><input type="radio" name="q2" value="Все желающие"><span>Все желающие</span></label>
+          <label class="radio-label"><input type="radio" name="q2" value="Старший состав"><span>Только старший состав</span></label>
+          <label class="radio-label"><input type="radio" name="q2" value="Члены семьи с боевыми стилями"><span>Члены семьи, имеющие хотя бы один боевой стиль</span></label>
+          <label class="radio-label"><input type="radio" name="q2" value="Приглашённые гости"><span>Только приглашённые гости</span></label>
+          <label class="radio-label"><input type="radio" name="q2" value="Только новички"><span>Только новички</span></label>
+        </div>
+        <div class="error" id="errorQ2"></div>
+      </div>
+
+      <div>
+        <label class="question-label">3. Что запрещено на турнире Кумите?</label>
+        <div class="radio-group" id="q3">
+          <label class="radio-label"><input type="radio" name="q3" value="Использование аксессуаров"><span>Использование аксессуаров</span></label>
+          <label class="radio-label"><input type="radio" name="q3" value="Приём наркотиков"><span>Приём наркотиков</span></label>
+          <label class="radio-label"><input type="radio" name="q3" value="Всё"><span>Всё вышеперечисленные</span></label>
+          <label class="radio-label"><input type="radio" name="q3" value="Использование запрещённых приёмов"><span>Использование запрещённых приёмов</span></label>
+          <label class="radio-label"><input type="radio" name="q3" value="Срыв регламента"><span>Срыв регламента турнира</span></label>
+        </div>
+        <div class="error" id="errorQ3"></div>
+      </div>
+
+      <div>
+        <label class="question-label">4. Как часто проводится турнир Кумите?</label>
+        <div class="radio-group" id="q4">
+          <label class="radio-label"><input type="radio" name="q4" value="Ежедневно"><span>Ежедневно</span></label>
+          <label class="radio-label"><input type="radio" name="q4" value="Еженедельно"><span>Еженедельно</span></label>
+          <label class="radio-label"><input type="radio" name="q4" value="Ежемесячно"><span>Ежемесячно</span></label>
+          <label class="radio-label"><input type="radio" name="q4" value="Раз в год"><span>Раз в год</span></label>
+          <label class="radio-label"><input type="radio" name="q4" value="По особому расписанию"><span>По особому расписанию</span></label>
+        </div>
+        <div class="error" id="errorQ4"></div>
+      </div>
+
+      <div>
+        <label class="question-label">5. Что такое Кумите?</label>
+        <div class="radio-group" id="q5">
+          <label class="radio-label"><input type="radio" name="q5" value="Турнир по каратэ и другим стилям боя"><span>Турнир по каратэ и другим стилям боя</span></label>
+          <label class="radio-label"><input type="radio" name="q5" value="Танцы с бубном"><span>Танцы с бубном</span></label>
+          <label class="radio-label"><input type="radio" name="q5" value="Каратэ с призами"><span>Это каратэ, где можно заработать деньги</span></label>
+          <label class="radio-label"><input type="radio" name="q5" value="Фестиваль"><span>Фестиваль боевых искусств</span></label>
+          <label class="radio-label"><input type="radio" name="q5" value="Игра"><span>Просто игра на сервере</span></label>
+        </div>
+        <div class="error" id="errorQ5"></div>
+      </div>
+
+      <label for="musicSelect">Выберите музыку:</label>
+      <select id="musicSelect">
+        <option value="cala_bonita.m4a">Cala Bonita</option>
+        <option value="clack_bum.m4a">Clack bum</option>
+        <option value="hope.mp3">Hope</option>
+        <option value="bala_love.m4a">Bala love</option>
+        <option value="Montagem_r.m4a">Montagem R</option>
+        <option value="PASSO_BEM_SOLTO_Ultra_Slowed.m4a">PASSO BEM SOLTO</option>
+        <option value="Montagem_Bandido_S.m4a">Montagem Bandido S</option>
+        <option value="bloody_ultra_slowed.m4a">BLOODY ULTRA SLOWED</option>
+      </select>
+
+      <button type="submit">Проверить</button>
+    </form>
+
+    <div class="result" id="resultBox"></div>
+    <button class="retry-btn" id="retryBtn">Начать заново</button>
+  </div>
+
+  <audio id="bgMusic" loop></audio>
+  <button class="music-toggle" id="musicToggleBtn"><span id="musicIcon">🔇</span> <span id="musicText">Вкл</span></button>
+
+  <script>
+    const correctAnswers = {
+      q1: 'В спортзале г.Лас Вентурас',
+      q2: 'Члены семьи с боевыми стилями',
+      q3: 'Всё',
+      q4: 'Ежемесячно',
+      q5: 'Турнир по каратэ и другим стилям боя'
+    };
+
+    const form = document.getElementById('quizForm');
+    const resultBox = document.getElementById('resultBox');
+    const retryBtn = document.getElementById('retryBtn');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      let score = 0;
+      let error = false;
+
+      function checkQuestion(q) {
+        const radios = document.querySelectorAll(`input[name="${q}"]`);
+        const selected = [...radios].find(r => r.checked);
+        document.getElementById('error' + q.toUpperCase()).textContent = selected ? "" : "Выберите ответ";
+        if (!selected) error = true;
+        else if (selected.value === correctAnswers[q]) {
+          score++;
+        }
+      }
+
+      document.getElementById('errorName').textContent = name ? "" : "Введите ник";
+      if (!name) error = true;
+
+      ["q1", "q2", "q3", "q4", "q5"].forEach(checkQuestion);
+      if (error) return;
+
+      form.style.display = 'none';
+      retryBtn.style.display = 'inline-block';
+
+      resultBox.innerHTML = `<strong>${name}</strong><br>Ваш результат: ${score} из 5<br><br>${score === 5 ? "🎉 Отлично! Вы готовы к повышению." : "🔁 Попробуйте ещё раз."}`;
+      resultBox.style.display = 'block';
+    });
+
+    retryBtn.onclick = () => {
+      form.reset();
+      form.style.display = 'block';
+      resultBox.style.display = 'none';
+      retryBtn.style.display = 'none';
+      [...document.querySelectorAll('.error')].forEach(el => el.textContent = "");
+    };
+
+    // Музыка
+    const bgMusic = document.getElementById('bgMusic');
+    const musicSelect = document.getElementById('musicSelect');
+    const musicToggleBtn = document.getElementById('musicToggleBtn');
+    const musicIcon = document.getElementById('musicIcon');
+    const musicText = document.getElementById('musicText');
+    let isPlaying = false;
+
+    musicSelect.addEventListener('change', () => {
+      bgMusic.src = musicSelect.value;
+      if (isPlaying) bgMusic.play();
+    });
+
+    musicToggleBtn.addEventListener('click', () => {
+      if (isPlaying) {
+        bgMusic.pause();
+        musicIcon.textContent = "🔇";
+        musicText.textContent = "Вкл";
+      } else {
+        bgMusic.src = musicSelect.value;
+        bgMusic.play().catch(() => {});
+        musicIcon.textContent = "🔊";
+        musicText.textContent = "Выкл";
+      }
+      isPlaying = !isPlaying;
+    });
+
+    window.addEventListener("DOMContentLoaded", () => {
+      bgMusic.src = musicSelect.value;
+    });
+  </script>
+</body>
+</html>

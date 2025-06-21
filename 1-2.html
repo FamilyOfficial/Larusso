@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LARUSSO Тест</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Rubik', sans-serif;
+      background: linear-gradient(to right, #1f2937, #111827);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .card {
+      background-color: #1c1f26;
+      padding: 40px;
+      max-width: 750px;
+      width: 95%;
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+      position: relative;
+    }
+
+    .logo {
+      display: block;
+      margin: 0 auto 25px;
+      max-width: 160px;
+      border-radius: 50%;
+      border: 3px solid #10b981;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 30px;
+      color: #10b981;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #4b5563;
+      background-color: #111827;
+      color: #e5e7eb;
+      font-size: 15px;
+      margin-bottom: 5px;
+    }
+
+    input::placeholder {
+      color: #9ca3af;
+    }
+
+    .error {
+      color: #f87171;
+      font-size: 13px;
+      margin: 4px 0 15px;
+      min-height: 18px;
+    }
+
+    .radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+    .radio-label {
+      flex: 1 1 calc(50% - 12px);
+      background-color: #111827;
+      padding: 14px 20px;
+      border-radius: 12px;
+      border: 2px solid #4b5563;
+      cursor: pointer;
+      position: relative;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+      user-select: none;
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+    .radio-label:hover {
+      border-color: #10b981;
+      background-color: #172022;
+    }
+    .radio-label input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      margin: 0;
+      height: 0;
+      width: 0;
+    }
+    .radio-label input[type="radio"]:checked + span {
+      background-color: #10b981;
+      color: white;
+      border-radius: 10px;
+      padding: 6px 12px;
+      font-weight: 600;
+      display: inline-block;
+      transition: background-color 0.3s ease;
+    }
+
+    button[type="submit"], .retry-btn {
+      margin-top: 30px;
+      width: 100%;
+      padding: 14px;
+      background-color: #10b981;
+      color: #fff;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    button[type="submit"]:hover, .retry-btn:hover {
+      background-color: #0f9f77;
+    }
+    .retry-btn {
+      background-color: #ef4444;
+      margin-top: 20px;
+      display: none;
+    }
+
+    .result {
+      margin-top: 25px;
+      padding: 20px;
+      background-color: #065f46;
+      border-radius: 12px;
+      text-align: center;
+      font-size: 18px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      display: none;
+      color: #fff;
+    }
+    .result.show {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .result strong {
+      font-size: 20px;
+      color: #fff;
+    }
+
+    /* Стили для селекта музыки */
+    label[for="musicSelect"] {
+      margin-top: 20px;
+      color: #10b981;
+      font-weight: 600;
+    }
+
+    .music-toggle {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background-color: #10b981;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      z-index: 9999;
+      box-shadow: 0 4px 8px rgba(16, 185, 129, 0.4);
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .music-toggle:hover {
+      background-color: #0f9f77;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <img src="logo.png" alt="LARUSSO Logo" class="logo" />
+    <h1>Тест на повышение<br>с 1 на 2 ранг<br>LARUSSO Family</h1>
+
+    <form id="quizForm" novalidate>
+      <label for="name">Ваш ник:</label>
+      <input type="text" id="name" placeholder="Например: Family_Larusso" />
+      <div class="error" id="errorName"></div>
+
+      <!-- Вопросы -->
+      <div id="questionsContainer"></div>
+
+      <label for="musicSelect">Выберите музыку:</label>
+      <select id="musicSelect">
+        <option value="cala_bonita.m4a">Cala Bonita</option>
+        <option value="clack_bum.m4a">Clack bum</option>
+        <option value="hope.mp3">Hope</option>
+        <option value="bala_love.m4a">Bala love</option>
+        <option value="Montagem_r.m4a">Montagem R</option>
+        <option value="PASSO_BEM_SOLTO_Ultra_Slowed.m4a">PASSO BEM SOLTO</option>
+        <option value="Montagem_Bandido_S.m4a">Montagem Bandido S</option>
+        <option value="bloody_ultra_slowed.m4a">BLOODY ULTRA SLOWED</option>
+      </select>
+
+      <button type="submit">Проверить</button>
+    </form>
+
+    <div class="result" id="resultBox"></div>
+    <button class="retry-btn" id="retryBtn">Начать заново</button>
+  </div>
+
+  <audio id="bgMusic" loop></audio>
+
+  <button class="music-toggle" id="musicToggleBtn">
+    <span id="musicIcon">🔇</span> <span id="musicText">Вкл</span>
+  </button>
+
+  <script>
+    // Данные вопросов с вариантами и правильными ответами
+    const questions = [
+      {
+        id: "q1",
+        text: "1. Можно ли употреблять наркотики членам семьи, не состоящим в КС, на кумите или МП?",
+        correct: "нельзя",
+        options: [
+          {value: "нельзя", label: "Нельзя — это строго запрещено правилами семьи."},
+          {value: "если_никто", label: "Можно, если никто не видит."},
+          {value: "на_мп", label: "Можно только на МП."},
+          {value: "всем_можно", label: "Разрешено всем, у кого есть доступ."}
+        ]
+      },
+      {
+        id: "q2",
+        text: "2. Кто отвечает за защиту прав членов семьи?",
+        correct: "глава",
+        options: [
+          {value: "глава", label: "Глава семьи — он гарант прав и порядка."},
+          {value: "сам", label: "Члены семьи сами за себя отвечают."},
+          {value: "адвокат", label: "Специальный адвокат."},
+          {value: "никто", label: "Никто — у нас свободная семья."}
+        ]
+      },
+      {
+        id: "q3",
+        text: "3. В какое время можно арендовать транспорт у главы?",
+        correct: "17",
+        options: [
+          {value: "17", label: "В 17:00 по МСК — строго по правилам."},
+          {value: "в_любое", label: "В любое удобное для игрока время."},
+          {value: "утро", label: "С 9:00 до 12:00."},
+          {value: "ночь", label: "После 22:00, когда глава не занят."}
+        ]
+      },
+      {
+        id: "q4",
+        text: "4. Должен ли каждый с честью носить имя Ларуссо?",
+        correct: "да",
+        options: [
+          {value: "да", label: "Да — это обязательное условие членства в семье."},
+          {value: "по_желанию", label: "Нет, это по желанию."},
+          {value: "только_лидеры", label: "Только лидеры обязаны."},
+          {value: "можно_скрывать", label: "Можно скрывать принадлежность к семье."}
+        ]
+      },
+      {
+        id: "q5",
+        text: "5. Что должен делать каждый член семьи?",
+        correct: "вносить",
+        options: [
+          {value: "вносить", label: "Вносить вклад в развитие семьи и её авторитет."},
+          {value: "ничего", label: "Ничего, главное просто быть в семье."},
+          {value: "только_свои", label: "Заниматься только своими делами."},
+          {value: "только_главе", label: "Подчиняться только главе и не думать о развитии."}
+        ]
+      }
+    ];
+
+    // Перемешивание массива (Фишер-Йейтс)
+    function shuffleArray(array) {
+      let arr = array.slice();
+      for (let i = arr.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // Отрисовка вопросов с радио кнопками
+    function renderQuestions() {
+      const container = document.getElementById('questionsContainer');
+      container.innerHTML = '';
+
+      questions.forEach(({id, text, options}) => {
+        const qWrapper = document.createElement('div');
+        qWrapper.innerHTML = `<label>${text}</label><div class="radio-group" id="${id}Group"></div><div class="error" id="error-${id}"></div>`;
+
+        const optionsContainer = qWrapper.querySelector(`#${id}Group`);
+        const shuffledOptions = shuffleArray(options);
+
+        shuffledOptions.forEach(({value, label}) => {
+          const optionHTML = `
+            <label class="radio-label">
+              <input type="radio" name="${id}" value="${value}" />
+              <span>${label}</span>
+            </label>
+          `;
+          optionsContainer.insertAdjacentHTML('beforeend', optionHTML);
+        });
+
+        container.appendChild(qWrapper);
+      });
+    }
+
+    // Проверка ошибок (ник и ответы)
+    function validate() {
+      let valid = true;
+      const nick = document.getElementById('name').value.trim();
+      const errorName = document.getElementById('errorName');
+      if (!nick) {
+        errorName.textContent = 'Введите ник';
+        valid = false;
+      } else {
+        errorName.textContent = '';
+      }
+
+      questions.forEach(({id}) => {
+        const errorEl = document.getElementById(`error-${id}`);
+        const checked = document.querySelector(`input[name="${id}"]:checked`);
+        if (!checked) {
+          errorEl.textContent = 'Выберите ответ';
+          valid = false;
+        } else {
+          errorEl.textContent = '';
+        }
+      });
+
+      return valid;
+    }
+
+    // Подсчёт очков
+    function calculateScore() {
+      let score = 0;
+      questions.forEach(({id, correct}) => {
+        const checked = document.querySelector(`input[name="${id}"]:checked`);
+        if (checked && checked.value === correct) score++;
+      });
+      return score;
+    }
+
+    // Элементы для управления
+    const quizForm = document.getElementById('quizForm');
+    const resultBox = document.getElementById('resultBox');
+    const retryBtn = document.getElementById('retryBtn');
+
+    quizForm.addEventListener('submit', e => {
+      e.preventDefault();
+
+      if (!validate()) return;
+
+      const nick = document.getElementById('name').value.trim();
+      const score = calculateScore();
+
+      resultBox.innerHTML = `<strong>${nick}</strong><br>Ваш результат: ${score} из 5<br><br>` +
+        (score === 5
+          ? `🎉 Отлично! Вы готовы к повышению.<br><br>📸 <em>Сделай скрин для отчёта</em>`
+          : `🔁 Недостаточно. Попробуйте ещё раз.`);
+
+      resultBox.classList.add('show');
+      retryBtn.style.display = score < 5 ? 'block' : 'none';
+      quizForm.style.display = 'none';
+    });
+
+    retryBtn.addEventListener('click', () => {
+      quizForm.reset();
+      renderQuestions();
+      resultBox.classList.remove('show');
+      retryBtn.style.display = 'none';
+      quizForm.style.display = 'block';
+      document.getElementById('errorName').textContent = '';
+      questions.forEach(({id}) => {
+        document.getElementById(`error-${id}`).textContent = '';
+      });
+    });
+
+    // Инициализация музыки и кнопок
+    const bgMusic = document.getElementById('bgMusic');
+    const musicSelect = document.getElementById('musicSelect');
+    const musicToggleBtn = document.getElementById('musicToggleBtn');
+    const musicIcon = document.getElementById('musicIcon');
+    const musicText = document.getElementById('musicText');
+    let isPlaying = false;
+
+    function toggleMusic() {
+      if (isPlaying) {
+        bgMusic.pause();
+        musicIcon.textContent = '🔇';
+        musicText.textContent = 'Вкл';
+      } else {
+        bgMusic.play().catch(() => {
+          alert('Чтобы включить музыку, взаимодействуйте с сайтом (нажмите кнопку ещё раз)');
+        });
+        musicIcon.textContent = '🔊';
+        musicText.textContent = 'Выкл';
+      }
+      isPlaying = !isPlaying;
+    }
+
+    musicToggleBtn.addEventListener('click', toggleMusic);
+
+    musicSelect.addEventListener('change', () => {
+      bgMusic.src = musicSelect.value;
+      bgMusic.load();
+      if (isPlaying) {
+        bgMusic.play().catch(() => {});
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      bgMusic.src = musicSelect.value;
+      renderQuestions();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Тест на повышение с 3 до 4 ранга — LARUSSO</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Rubik', sans-serif;
+      background: linear-gradient(to right, #1f2937, #111827);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .card {
+      background-color: #1c1f26;
+      padding: 40px;
+      max-width: 750px;
+      width: 100%;
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.4);
+      position: relative;
+    }
+    .logo {
+      display: block;
+      margin: 0 auto 25px;
+      max-width: 160px;
+      border-radius: 50%;
+      border: 3px solid #10b981;
+    }
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 30px;
+      color: #10b981;
+      line-height: 1.3;
+    }
+    .question-label {
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: block;
+      font-size: 16px;
+    }
+    .radio-group {
+      margin-bottom: 25px;
+    }
+    .radio-label {
+      display: block;
+      background-color: #111827;
+      padding: 14px 20px;
+      border-radius: 12px;
+      border: 2px solid #4b5563;
+      cursor: pointer;
+      margin-bottom: 10px;
+      color: #e5e7eb;
+      transition: 0.3s;
+      position: relative;
+    }
+    .radio-label:hover {
+      border-color: #10b981;
+      background-color: #172022;
+    }
+    .radio-label input {
+      position: absolute;
+      opacity: 0;
+    }
+    .radio-label input:checked + span {
+      background-color: #10b981;
+      color: white;
+      border-radius: 10px;
+      padding: 6px 12px;
+      font-weight: 600;
+      display: inline-block;
+    }
+    .error {
+      color: #f87171;
+      font-size: 13px;
+      margin-top: -5px;
+      margin-bottom: 15px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 15px;
+      border-radius: 10px;
+      border: 1px solid #4b5563;
+      background-color: #111827;
+      color: #e5e7eb;
+      margin-bottom: 20px;
+    }
+    button[type="submit"] {
+      width: 100%;
+      padding: 14px;
+      background-color: #10b981;
+      color: #fff;
+      font-size: 16px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 25px;
+      padding: 20px;
+      background-color: #065f46;
+      border-radius: 15px;
+      text-align: center;
+      font-size: 18px;
+      display: none;
+      color: #e0ffe0;
+    }
+    .retry-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #ef4444;
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      display: none;
+    }
+    label[for="musicSelect"] {
+      margin-top: 20px;
+      display: block;
+      font-weight: 600;
+      color: #10b981;
+      margin-bottom: 8px;
+    }
+    select#musicSelect {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #4b5563;
+      background-color: #111827;
+      color: #e5e7eb;
+      font-size: 15px;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+    .music-toggle {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background-color: #10b981;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <img src="logo.png" alt="LARUSSO Logo" class="logo" />
+    <h1>Тест на повышение с 3 до 4 ранга<br>LARUSSO Family</h1>
+
+    <form id="quizForm">
+      <label for="name">Введите ваш ник:</label>
+      <input type="text" id="name" placeholder="Например: Family_Larusso" />
+      <div class="error" id="errorName"></div>
+
+      <div>
+        <label class="question-label">1. Сколько человек должно участвовать в СМП, чтобы оно считалось состоявшимся?</label>
+        <div class="radio-group" id="q1">
+          <label class="radio-label"><input type="radio" name="q1" value="1"><span>1 человек</span></label>
+          <label class="radio-label"><input type="radio" name="q1" value="3"><span>3 человека</span></label>
+          <label class="radio-label"><input type="radio" name="q1" value="5"><span>5 человек</span></label>
+          <label class="radio-label"><input type="radio" name="q1" value="7"><span>7 человек</span></label>
+          <label class="radio-label"><input type="radio" name="q1" value="10"><span>10 человек</span></label>
+        </div>
+        <div class="error" id="errorQ1"></div>
+      </div>
+
+      <div>
+        <label class="question-label">2. Что обязан сделать организатор перед проведением СМП?</label>
+        <div class="radio-group" id="q2">
+          <label class="radio-label"><input type="radio" name="q2" value="без согласования"><span>Провести мероприятие без предварительного согласования</span></label>
+          <label class="radio-label"><input type="radio" name="q2" value="заявка на форуме"><span>Оставить заявку в соответствующей теме на форуме</span></label>
+          <label class="radio-label"><input type="radio" name="q2" value="сообщить в чат"><span>Сообщить об этом в общем чате семьи</span></label>
+          <label class="radio-label"><input type="radio" name="q2" value="утвердить план"><span>Утвердить план у старшего состава семьи</span></label>
+          <label class="radio-label"><input type="radio" name="q2" value="призы"><span>Подготовить призы для участников</span></label>
+        </div>
+        <div class="error" id="errorQ2"></div>
+      </div>
+
+      <div>
+        <label class="question-label">3. Какие мероприятия считаются семейными (СМП)?</label>
+        <div class="radio-group" id="q3">
+          <label class="radio-label"><input type="radio" name="q3" value="форумные"><span>Форумные мероприятия</span></label>
+          <label class="radio-label"><input type="radio" name="q3" value="старший состав"><span>Мероприятия старшего состава</span></label>
+          <label class="radio-label"><input type="radio" name="q3" value="оба варианта"><span>Форумные и от старшего состава</span></label>
+          <label class="radio-label"><input type="radio" name="q3" value="тренировки"><span>Внутренние тренировки</span></label>
+          <label class="radio-label"><input type="radio" name="q3" value="все события"><span>Все игровые события</span></label>
+        </div>
+        <div class="error" id="errorQ3"></div>
+      </div>
+
+      <div>
+        <label class="question-label">4. Основная цель семейных мероприятий (СМП)?</label>
+        <div class="radio-group" id="q4">
+          <label class="radio-label"><input type="radio" name="q4" value="деньги"><span>Заработать деньги на мероприятии</span></label>
+          <label class="radio-label"><input type="radio" name="q4" value="комьюнити"><span>Улучшить внутрисемейное комьюнити и сплочённость</span></label>
+          <label class="radio-label"><input type="radio" name="q4" value="рейтинг"><span>Повысить рейтинг семьи на сервере</span></label>
+          <label class="radio-label"><input type="radio" name="q4" value="развлечения"><span>Развлечения для всех</span></label>
+          <label class="radio-label"><input type="radio" name="q4" value="план"><span>Выполнить план от руководства</span></label>
+        </div>
+        <div class="error" id="errorQ4"></div>
+      </div>
+
+      <div>
+        <label class="question-label">5. Какие действия запрещены во время СМП?</label>
+        <div class="radio-group" id="q5">
+          <label class="radio-label"><input type="radio" name="q5" value="всё можно"><span>Можно делать всё, что хочется</span></label>
+          <label class="radio-label"><input type="radio" name="q5" value="запрещено срывы"><span>Запрещены действия, ведущие к срыву</span></label>
+          <label class="radio-label"><input type="radio" name="q5" value="инициатива"><span>Можно проявлять инициативу без согласования</span></label>
+          <label class="radio-label"><input type="radio" name="q5" value="договоренности"><span>Разрешены неформальные договорённости</span></label>
+          <label class="radio-label"><input type="radio" name="q5" value="читы"><span>Разрешено использование читов</span></label>
+        </div>
+        <div class="error" id="errorQ5"></div>
+      </div>
+
+      <label for="musicSelect">Выберите музыку:</label>
+      <select id="musicSelect">
+        <option value="cala_bonita.m4a">Cala Bonita</option>
+        <option value="clack_bum.m4a">Clack bum</option>
+        <option value="hope.mp3">Hope</option>
+        <option value="bala_love.m4a">Bala love</option>
+        <option value="Montagem_r.m4a">Montagem R</option>
+        <option value="PASSO_BEM_SOLTO_Ultra_Slowed.m4a">PASSO BEM SOLTO</option>
+        <option value="Montagem_Bandido_S.m4a">Montagem Bandido S</option>
+        <option value="bloody_ultra_slowed.m4a">BLOODY ULTRA SLOWED</option>
+      </select>
+
+      <button type="submit">Проверить</button>
+    </form>
+
+    <div class="result" id="resultBox"></div>
+    <button class="retry-btn" id="retryBtn">Начать заново</button>
+  </div>
+
+  <audio id="bgMusic" loop></audio>
+  <button class="music-toggle" id="musicToggleBtn"><span id="musicIcon">🔇</span> <span id="musicText">Вкл</span></button>
+
+  <script>
+    const correctAnswers = {
+      q1: '3',
+      q2: 'заявка на форуме',
+      q3: 'оба варианта',
+      q4: 'комьюнити',
+      q5: 'запрещено срывы'
+    };
+
+    const form = document.getElementById('quizForm');
+    const resultBox = document.getElementById('resultBox');
+    const retryBtn = document.getElementById('retryBtn');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      let score = 0;
+      let error = false;
+
+      function checkQuestion(q) {
+        const radios = document.querySelectorAll(`input[name="${q}"]`);
+        const selected = [...radios].find(r => r.checked);
+        document.getElementById('error' + q.toUpperCase()).textContent = selected ? "" : "Выберите ответ";
+        if (!selected) error = true;
+        else if (selected.value === correctAnswers[q]) {
+          score += (q === "q2" ? 2 : 1);
+        }
+      }
+
+      document.getElementById('errorName').textContent = name ? "" : "Введите ник";
+      if (!name) error = true;
+
+      ["q1", "q2", "q3", "q4", "q5"].forEach(checkQuestion);
+      if (error) return;
+
+      form.style.display = 'none';
+      retryBtn.style.display = 'inline-block';
+      const max = 6;
+      resultBox.innerHTML = `<strong>${name}</strong><br>Ваш результат: ${score} из ${max}<br><br>${score === max ? "🎉 Отлично! Вы готовы к повышению." : "🔁 Попробуйте ещё раз."}`;
+      resultBox.style.display = 'block';
+    });
+
+    retryBtn.onclick = () => {
+      form.reset();
+      form.style.display = 'block';
+      resultBox.style.display = 'none';
+      retryBtn.style.display = 'none';
+      [...document.querySelectorAll('.error')].forEach(el => el.textContent = "");
+    };
+
+    // Музыка
+    const bgMusic = document.getElementById('bgMusic');
+    const musicSelect = document.getElementById('musicSelect');
+    const musicToggleBtn = document.getElementById('musicToggleBtn');
+    const musicIcon = document.getElementById('musicIcon');
+    const musicText = document.getElementById('musicText');
+    let isPlaying = false;
+
+    musicSelect.addEventListener('change', () => {
+      bgMusic.src = musicSelect.value;
+      if (isPlaying) bgMusic.play();
+    });
+
+    musicToggleBtn.addEventListener('click', () => {
+      if (isPlaying) {
+        bgMusic.pause();
+        musicIcon.textContent = "🔇";
+        musicText.textContent = "Вкл";
+      } else {
+        bgMusic.src = musicSelect.value;
+        bgMusic.play().catch(() => {});
+        musicIcon.textContent = "🔊";
+        musicText.textContent = "Выкл";
+      }
+      isPlaying = !isPlaying;
+    });
+
+    window.addEventListener("DOMContentLoaded", () => {
+      bgMusic.src = musicSelect.value;
+    });
+  </script>
+</body>
+</html>
